@@ -9,12 +9,21 @@ function initDB() {
   const url = process.env.DATABASE_URL || 'file:data/ircc_tracker.db';
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
-  // Make sure the directory exists if using a local file
+  // Warn loudly in production if remote DB env vars are missing
+  if (!process.env.DATABASE_URL) {
+    console.warn('[DB] WARNING: DATABASE_URL not set, falling back to local file. This will FAIL on Vercel.');
+  }
+
+  // Only attempt filesystem operations for local file DBs
   if (url.startsWith('file:') && !url.includes(':memory:')) {
-    const dataPath = url.replace('file:', '');
-    const dataDir = path.dirname(path.join(__dirname, dataPath));
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
+    try {
+      const dataPath = url.replace('file:', '');
+      const dataDir = path.dirname(path.join(__dirname, dataPath));
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+    } catch (e) {
+      console.error('[DB] Could not create data directory (expected on Vercel):', e.message);
     }
   }
 

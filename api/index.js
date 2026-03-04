@@ -1,8 +1,6 @@
 /**
  * Vercel Serverless Entry Point
  * Wraps the Express app for deployment on Vercel.
- * The seeder and automation run lazily (once per cold start) and are safe
- * in a serverless environment because they only use the Turso HTTP client.
  */
 require('dotenv').config();
 
@@ -27,7 +25,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/admin', adminRoutes);
 
-// ── SPA Fallback ────────────────────────────────────────────────────────────
+// ── SPA Fallback ─────────────────────────────────────────────────────────── 
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'admin.html'));
 });
@@ -35,29 +33,47 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-// ── DB Init + optional lazy seed (runs once per cold start) ─────────────────
+// ── DB Init (lazy, once per cold start) ─────────────────────────────────────
 let dbReady = false;
 let dbInitPromise = null;
+let dbError = null;
 
 async function ensureDB() {
     if (dbReady) return;
+    if (dbError) throw dbError;
     if (!dbInitPromise) {
-        dbInitPromise = initDB().then(async () => {
-            dbReady = true;
-            // Only seed if this is a cold start (no-op if data exists)
-            try {
-                const { seedDatabase } = require('../services/seeder');
-                await seedDatabase();
-            } catch (e) {
-                console.error('[Boot] Seeder error:', e.message);
-            }
-        });
+        dbInitPromise = initDB()
+            .then(async () => {
+                dbReady = true;
+                // Seed only if no data yet (idempotent)
+                try {
+                    const { seedDatabase } = require('../services/seeder');
+                    await seedDatabase();
+                } catch (e) {
+                    // Non-fatal — seeder errors don't block the app
+                    console.error('[Boot] Seeder error (non-fatal):', e.message);
+                }
+            })
+            .catch(err => {
+                dbError = err;
+                dbInitPromise = null; // allow retry
+                throw err;
+            });
     }
     return dbInitPromise;
 }
 
-// Wrap handler: ensure DB is ready before serving any request
+// ── Exported handler ─────────────────────────────────────────────────────────
 module.exports = async (req, res) => {
-    await ensureDB();
+    try {
+        await ensureDB();
+    } catch (err) {
+        console.error('[Handler] DB init failed:', err.message);
+        return res.status(500).json({
+            error: 'Database connection failed',
+            message: err.message,
+            hint: 'Make sure DATABASE_URL and TURSO_AUTH_TOKEN are set in Vercel environment variables'
+        });
+    }
     return app(req, res);
 };
