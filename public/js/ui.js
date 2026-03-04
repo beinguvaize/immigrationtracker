@@ -225,15 +225,22 @@ const ui = {
         // Limit to 5 most recent
         const items = successes.slice(0, 5);
 
-        const rows = items.map(s => `
+        const rows = items.map(s => {
+            const noc = (typeof lookupNOC === 'function') ? lookupNOC(s.noc_code) : null;
+            const jobTitle = noc ? noc.title : s.noc_code;
+            const teer = noc ? noc.teer : null;
+            return `
             <tr>
                 <td><div class="success-item__icon">🏆</div></td>
-                <td><strong>NOC ${s.noc_code}</strong></td>
+                <td>
+                    <div style="font-weight:600; font-size:13px">${jobTitle}</div>
+                    <div style="font-size:11px; color:var(--text-muted)">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
+                </td>
                 <td><span class="app-tag">${s.program_type}</span></td>
                 <td><span class="text-secondary" style="font-size: 11px">Nominated: ${this.formatDate(s.nominated_date)}</span></td>
                 <td class="text-secondary">${this.getDaysAgo(s.nominated_date)}</td>
             </tr>
-        `).join('');
+        `}).join('');
 
         return `
             <div class="table-card table-card--successes">
@@ -267,11 +274,19 @@ const ui = {
             return `<tr><td colspan="8" style="text-align: center; padding: var(--space-10); color: var(--text-muted);">No matching applications found</td></tr>`;
         }
 
-        return rows.map(row => `
+        return rows.map(row => {
+            const noc = (typeof lookupNOC === 'function') ? lookupNOC(row.noc_code) : null;
+            const jobTitle = noc ? noc.title : '';
+            const teer = noc ? noc.teer : null;
+            return `
             <tr>
                 <td style="font-weight: var(--fw-bold)">${row.program_type}</td>
                 <td style="font-size: 11px; opacity: 0.8;">${row.stream}</td>
-                <td class="cell-mono">${row.noc_code}</td>
+                <td class="cell-mono">
+                    <div style="font-weight:600">${row.noc_code}</div>
+                    ${jobTitle ? `<div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">${jobTitle}</div>` : ''}
+                    ${teer !== null ? `<span style="font-size:10px; padding:1px 6px; border-radius:10px; background:var(--bg-accent-light); color:var(--bg-accent); font-weight:700;">TEER ${teer}</span>` : ''}
+                </td>
                 <td>${this.formatDate(row.submission_date)}</td>
                 <td>
                     <span class="status-pill status-pill--${row.status.toLowerCase()}">${row.status}</span>
@@ -284,7 +299,7 @@ const ui = {
                 </td>
                 <td style="text-align: center;">${row.ns_graduate ? '🎓' : '—'}</td>
             </tr>
-        `).join('');
+        `}).join('');
     },
 
     renderPagination(pagination, callbackName = 'handlePageChange') {
