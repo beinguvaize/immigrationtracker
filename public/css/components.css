@@ -445,14 +445,14 @@
     flex-direction: column;
     min-height: 280px;
     max-height: 380px;
-    /* Slightly increased for more headroom */
 }
 
 @media (max-width: 640px) {
     .chart-card {
-        min-height: 200px;
-        /* Reduced for mobile */
-        padding: var(--space-3);
+        min-height: 180px;
+        /* Further reduced for mobile */
+        max-height: 280px;
+        padding: var(--space-2) var(--space-3);
     }
 }
 
@@ -470,14 +470,6 @@
     letter-spacing: 0.1em;
 }
 
-@media (max-width: 640px) {
-    .chart-card {
-        min-height: 240px;
-        max-height: 300px;
-        padding: var(--space-4);
-    }
-}
-
 /* ── Tables ────────────────────────────────────────── */
 .table-wrapper {
     width: 100%;
@@ -486,6 +478,14 @@
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-subtle);
     -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+    .table-wrapper {
+        max-height: 450px;
+        /* Controlled vertical scrolling */
+        overflow-y: auto;
+    }
 }
 
 /* Custom scrollbar for tables */
@@ -502,8 +502,9 @@
 
     .data-table th,
     .data-table td {
-        padding: var(--space-3) var(--space-2);
-        font-size: var(--fs-xs);
+        padding: var(--space-1) var(--space-2) !important;
+        /* Minimized height */
+        font-size: 11px !important;
     }
 }
 
@@ -614,9 +615,29 @@
 }
 
 .form-label {
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+@media (max-width: 640px) {
+    .form-group {
+        gap: 2px;
+        margin-bottom: var(--space-3);
+    }
+
+    .form-label {
+        font-size: 9px;
+    }
+
+    .form-select,
+    .form-input {
+        padding: var(--space-2) var(--space-3);
+        font-size: 13px;
+    }
 }
 
 .form-input,
@@ -1101,7 +1122,76 @@
     margin-top: 2px;
 }
 
-/* ── Responsive Charts ───────────────────────────── */
+/* ── Pagination Redesign ─────────────────────────── */
+.pagination {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.pagination__info {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+}
+
+.pagination__controls {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-medium);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    background: var(--bg-accent-light);
+}
+
+.pagination-btn--active {
+    background: var(--bg-accent) !important;
+    color: white !important;
+    border-color: var(--bg-accent) !important;
+    box-shadow: 0 4px 12px var(--accent-green-alpha);
+}
+
+.pagination-dots {
+    color: var(--text-muted);
+    padding: 0 var(--space-1);
+}
+
+@media (max-width: 640px) {
+    .pagination {
+        margin-top: var(--space-4);
+        padding-top: var(--space-4);
+    }
+
+    .pagination-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: var(--fs-xs);
+    }
+}
+
+/* ── Responsive Charts & Overrides ───────────────── */
 @media (max-width: 768px) {
     .chart-card {
         padding: var(--space-3);
