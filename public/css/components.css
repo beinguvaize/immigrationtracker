@@ -450,8 +450,9 @@
 
 @media (max-width: 640px) {
     .chart-card {
-        min-height: 240px;
-        padding: var(--space-4);
+        min-height: 200px;
+        /* Reduced for mobile */
+        padding: var(--space-3);
     }
 }
 
@@ -506,9 +507,18 @@
     }
 }
 
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    border-radius: var(--radius-lg);
+}
+
 .data-table {
     width: 100%;
-    min-width: 800px;
+    min-width: 600px;
+    /* Reduced from 800px to allow better fitting while maintaining structure */
     border-collapse: collapse;
 }
 

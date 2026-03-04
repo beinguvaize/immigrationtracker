@@ -16,6 +16,9 @@ body {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+    overflow-x: hidden;
+    /* Prevent global horizontal scroll */
+    width: 100%;
 }
 
 /* ── IRCC Tracker Layout ────────────────────────────── */
@@ -25,6 +28,9 @@ body {
     padding: var(--space-4);
     gap: var(--space-4);
     background: var(--bg-primary);
+    min-width: 0;
+    /* Important for flex child expansion */
+    max-width: 100%;
 }
 
 /* Sidebar Styling */
@@ -38,6 +44,34 @@ body {
     justify-content: space-between;
     box-shadow: var(--shadow-card);
     flex-shrink: 0;
+    transition: transform 0.3s ease, left 0.3s ease;
+}
+
+/* Sidebar Backdrop for Mobile */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1008;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar--open~.main-wrapper .sidebar-backdrop,
+.sidebar--open+.sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* If the backdrop is inside the body directly */
+.sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .main-wrapper {
@@ -46,6 +80,7 @@ body {
     flex-direction: column;
     gap: var(--space-4);
     min-width: 0;
+    max-width: 100%;
 }
 
 /* Header Styling */
@@ -69,6 +104,8 @@ body {
     box-shadow: var(--shadow-card);
     overflow-y: auto;
     position: relative;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* ── Branding ──────────────────────────────────────── */
@@ -149,20 +186,21 @@ h6 {
 
     .sidebar {
         position: fixed;
-        left: -280px;
+        left: -290px;
         top: 0;
         bottom: 0;
         z-index: 1010;
         border-radius: 0;
-        transition: var(--transition-base);
+        transition: transform 0.3s ease, left 0.3s ease;
         height: 100vh;
         width: 280px;
         box-shadow: none;
     }
 
     .sidebar--open {
-        left: 0;
-        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
+        left: 0 !important;
+        transform: none !important;
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
     }
 
     .main-wrapper {

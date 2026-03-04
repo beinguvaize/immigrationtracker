@@ -456,17 +456,24 @@ document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
 });
 
 // ===== MOBILE NAVIGATION =====
-document.getElementById('mobileNavToggle')?.addEventListener('click', () => {
-    document.querySelector('.sidebar')?.classList.toggle('sidebar--open');
-});
+const sidebar = document.querySelector('.sidebar');
+const backdrop = document.getElementById('sidebarBackdrop');
+
+function toggleSidebar() {
+    const isOpen = sidebar?.classList.toggle('sidebar--open');
+    document.body.classList.toggle('sidebar-is-open', isOpen);
+    backdrop?.classList.toggle('active', isOpen);
+}
+
+document.getElementById('mobileNavToggle')?.addEventListener('click', toggleSidebar);
+backdrop?.addEventListener('click', toggleSidebar);
 
 // Close sidebar when clicking outside on mobile
 document.addEventListener('click', (e) => {
-    const sidebar = document.querySelector('.sidebar');
     const toggle = document.getElementById('mobileNavToggle');
     if (window.innerWidth <= 1024 && sidebar?.classList.contains('sidebar--open')) {
-        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
-            sidebar.classList.remove('sidebar--open');
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target) && !backdrop.contains(e.target)) {
+            toggleSidebar();
         }
     }
 });
