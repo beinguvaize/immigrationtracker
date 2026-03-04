@@ -33,7 +33,12 @@ const ui = {
             `;
         }
 
-        const rows = apps.map(app => `
+        const rows = apps.map(app => {
+            const noc = (typeof lookupNOC === 'function') ? lookupNOC(app.noc_code) : null;
+            const jobTitle = noc ? noc.title : '';
+            const teer = noc ? noc.teer : null;
+
+            return `
             <tr>
                 <td>
                     <div class="app-info-cell">
@@ -41,7 +46,11 @@ const ui = {
                         <div class="app-info-cell__stream">${app.stream}</div>
                     </div>
                 </td>
-                <td class="cell-mono">${app.noc_code}</td>
+                <td class="cell-mono">
+                    <div style="font-weight:600">${app.noc_code}</div>
+                    ${jobTitle ? `<div class="job-title-cell" style="font-size:11px; margin-top:2px; font-weight:normal;">${jobTitle}</div>` : ''}
+                    ${teer !== null ? `<span style="font-size:10px; padding:1px 6px; border-radius:10px; background:var(--bg-accent-light); color:var(--bg-accent); font-weight:700;">TEER ${teer}</span>` : ''}
+                </td>
                 <td>${this.formatDate(app.submission_date)}</td>
                 <td>
                     <div class="status-pill status-pill--${app.status.toLowerCase().replace(/ /g, '-')}">
@@ -63,7 +72,7 @@ const ui = {
                     </div>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
 
         return `
             <div class="table-card table-card--dashboard">
