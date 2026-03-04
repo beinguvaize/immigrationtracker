@@ -121,7 +121,7 @@ async function reseed() {
 
     // ── STEP 2: Recreate admin ─────────────────────────────────────────────
     const adminHash = await bcrypt.hash('admin123', 10);
-    await prepare('INSERT OR IGNORE INTO users (email, password_hash, role) VALUES (?,?,?)').run('admin@immigrationtracker.ca', adminHash, 'admin');
+    await prepare('INSERT OR IGNORE INTO users (email, password_hash, role) VALUES (?,?,?)').run('admin@example.com', adminHash, 'admin');
 
     // ── STEP 3: Create 50 sample users ────────────────────────────────────
     const userHash = await bcrypt.hash('password123', 10);
