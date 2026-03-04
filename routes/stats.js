@@ -1,5 +1,6 @@
 const express = require('express');
 const { prepare } = require('../db');
+const { calculateWaitingTime, calculateWorkPermitCountdown } = require('../services/calculator');
 
 const router = express.Router();
 
@@ -161,15 +162,15 @@ router.get('/table', async (req, res) => {
     const total = await prepare(`SELECT COUNT(*) as c FROM applications ${whereClause}`).get(...params);
 
     // Fetch anonymized rows — NO user_id, NO id exposed
-    const rows = await prepare(`
+    const rawRows = await prepare(`
       SELECT
         program_type,
         stream,
         noc_code,
         submission_date,
+        work_permit_expiry,
         status,
-        waiting_months,
-        days_remaining,
+        nominated_date,
         risk_level,
         status_note,
         ns_graduate,
@@ -180,6 +181,26 @@ router.get('/table', async (req, res) => {
       ORDER BY ${sortCol} ${sortOrder}
       LIMIT ${limitNum} OFFSET ${offset}
     `).all(...params);
+
+    // Compute waiting time and work permit countdown live (never stale)
+    const rows = rawRows.map(row => {
+      const waiting = calculateWaitingTime(row.submission_date, row.status, row.nominated_date);
+      const countdown = calculateWorkPermitCountdown(row.work_permit_expiry);
+      return {
+        program_type: row.program_type,
+        stream: row.stream,
+        noc_code: row.noc_code,
+        submission_date: row.submission_date,
+        status: row.status,
+        waiting_months: waiting.totalMonths,
+        days_remaining: countdown.daysRemaining,
+        risk_level: countdown.riskLevel,
+        status_note: row.status_note,
+        ns_graduate: row.ns_graduate,
+        has_case_number: row.has_case_number,
+        case_number_date: row.case_number_date
+      };
+    });
 
     res.json({
       rows,
