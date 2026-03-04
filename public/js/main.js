@@ -9,7 +9,8 @@ const state = {
         filters: {
             noc_code: '',
             status: '',
-            risk_level: ''
+            risk_level: '',
+            ns_graduate: ''
         },
         sort: 'submission_date',
         order: 'desc',
