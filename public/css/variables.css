@@ -1,0 +1,147 @@
+:root {
+  /* ── Colors — Premium Light Theme ────────────────────── */
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8eef4;
+  --bg-accent: #dce4ed;
+
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-solid: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.55);
+  --bg-glass-hover: rgba(255, 255, 255, 0.75);
+
+  --text-primary: #0c1524;
+  --text-secondary: #3e5068;
+  --text-muted: #6b849e;
+  --text-accent: #2563eb;
+
+  --border-light: #e2e9f1;
+  --border-medium: #cdd7e3;
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-accent: rgba(37, 99, 235, 0.35);
+
+  /* Accents */
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #1d4ed8;
+  --accent-blue-alpha: rgba(37, 99, 235, 0.1);
+  --accent-maple: #c0392b;
+  --accent-maple-glow: rgba(192, 57, 43, 0.35);
+  --accent-red: #a0232e;
+  --accent-red-glow: rgba(160, 35, 46, 0.3);
+  --accent-white: #f8fafc;
+
+  /* Gradient Accents */
+  --gradient-primary: linear-gradient(135deg, #2563eb, #7c3aed);
+  --gradient-accent: linear-gradient(135deg, #c0392b, #e74c3c);
+  --gradient-success: linear-gradient(135deg, #059669, #10b981);
+  --gradient-warm: linear-gradient(135deg, #f59e0b, #ef4444);
+
+  /* Status Colors */
+  --success: #059669;
+  --success-bg: rgba(5, 150, 105, 0.08);
+  --warning: #d97706;
+  --warning-bg: rgba(217, 119, 6, 0.08);
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.08);
+  --info: #2563eb;
+  --info-bg: rgba(37, 99, 235, 0.08);
+  --pending: #f59e0b;
+  --pending-bg: rgba(245, 158, 11, 0.08);
+  --nominated: #059669;
+  --nominated-bg: rgba(5, 150, 105, 0.08);
+  --refused: #ef4444;
+  --refused-bg: rgba(239, 68, 68, 0.08);
+  --expired: #7c3aed;
+  --expired-bg: rgba(124, 58, 237, 0.08);
+
+  /* Typography */
+  --font-main: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.1875rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.125rem;
+  --fs-4xl: 2.75rem;
+  --fs-5xl: 3.5rem;
+
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-black: 900;
+
+  --lh-tight: 1.25;
+  --lh-relaxed: 1.625;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(192, 57, 43, 0.15);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --card-shadow-hover: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.05);
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --container-max: 1320px;
+  --transition-fast: 0.15s;
+  --transition-base: 0.25s;
+  --transition-slow: 0.4s;
+}
+
+/* ── Admin Dark Theme ────────────────────────────────── */
+body.admin-theme {
+  --bg-primary: #0b1120;
+  --bg-secondary: #151d30;
+  --bg-tertiary: #0b1120;
+
+  --bg-card: rgba(21, 29, 48, 0.95);
+  --bg-card-solid: #151d30;
+  --bg-glass: rgba(21, 29, 48, 0.7);
+  --bg-glass-hover: rgba(40, 55, 85, 0.8);
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --border-light: #1e293b;
+  --border-medium: #334155;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+
+  /* No flag on admin - clean dark */
+  background-image: none;
+  background-color: var(--bg-primary);
+}

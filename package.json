@@ -1,0 +1,18 @@
+{
+  "name": "ircc-tracker",
+  "version": "1.0.0",
+  "description": "Privacy-first immigration dashboard for NS PNP and AIP applicants",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "sql.js": "^1.10.3"
+  }
+}

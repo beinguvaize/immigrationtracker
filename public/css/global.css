@@ -1,0 +1,102 @@
+/* ── Reset & Base ───────────────────────────────────── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: var(--fs-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ── Nova Scotia Flag Background ────────────────────── */
+/* Visible watermark using the NS flag as a subtle branded background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../assets/ns_flag.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 60%;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Admin theme hides the flag */
+body.admin-theme::before {
+    display: none;
+}
+
+/* Ensure all body content renders above the flag watermark */
+body>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Links ──────────────────────────────────────────── */
+a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--accent-blue-hover);
+}
+
+/* ── Utility ────────────────────────────────────────── */
+.hidden {
+    display: none !important;
+}
+
+/* ── Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ── Layout ─────────────────────────────────────────── */
+.container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.main-content {
+    padding: 2rem 0;
+}
+
+/* ── Selection ──────────────────────────────────────── */
+::selection {
+    background: var(--accent-blue-alpha);
+    color: var(--accent-blue);
+}

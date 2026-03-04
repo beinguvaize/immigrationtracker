@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Privacy-first immigration tracking dashboard for Nova Scotia PNP and Atlantic Immigration Program applicants.">
+  <title>IRCC Tracker · Immigration Dashboard</title>
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🍁</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+
+<body>
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <section class="auth-screen" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <div class="auth-card__logo">🍁</div>
+        <h1 class="auth-card__title" id="authTitle">Welcome Back</h1>
+        <p class="auth-card__desc" id="authDesc">Sign in to your immigration tracker</p>
+      </div>
+
+      <div id="authError" class="auth-card__error hidden"></div>
+
+      <form class="auth-card__form" id="authForm">
+        <div class="form-group">
+          <label class="form-label" for="authEmail">Email Address</label>
+          <input class="form-input" type="email" id="authEmail" placeholder="you@example.com" required
+            autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="authPassword">Password</label>
+          <input class="form-input" type="password" id="authPassword" placeholder="Min. 6 characters" required
+            minlength="6" autocomplete="current-password">
+        </div>
+        <button class="btn btn--primary btn--full btn--lg" type="submit" id="authSubmitBtn">Sign In</button>
+      </form>
+
+      <div class="auth-card__toggle">
+        <span id="authToggleText">Don't have an account?</span>
+        <a href="#" id="authToggleLink">Create one</a>
+      </div>
+
+      <div class="disclaimer" style="margin-top: var(--space-6); margin-bottom: 0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        This dashboard is a private tracking tool and is not affiliated with Immigration, Refugees and Citizenship
+        Canada (IRCC).
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APP LAYOUT ===== -->
+  <div class="app-layout hidden" id="appLayout">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="navbar__brand">
+        <div class="navbar__logo">🍁</div>
+        <div>
+          <div class="navbar__title">IRCC Tracker</div>
+          <div class="navbar__subtitle">Immigration Dashboard</div>
+        </div>
+      </div>
+      <div class="navbar__actions">
+        <a href="/admin" class="btn btn--ghost btn--sm hidden" id="adminLink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+          Admin
+        </a>
+        <span class="navbar__user" id="navUserEmail"></span>
+        <span class="role-badge hidden" id="navRoleBadge"></span>
+        <button class="btn btn--ghost btn--sm" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <!-- Global System Announcement -->
+    <div id="systemAnnouncement" class="hidden"
+      style="background: var(--warning-bg); color: var(--warning); padding: 12px 24px; text-align: center; border-bottom: 1px solid var(--warning); font-weight: var(--fw-medium); font-size: var(--fs-sm);">
+      <span class="announcement-text"></span>
+    </div>
+
+    <main class="main-content">
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        This dashboard is a private tracking tool and is <strong>not affiliated</strong> with Immigration, Refugees and
+        Citizenship Canada (IRCC) or the Government of Canada.
+      </div>
+
+      <!-- ===== PART A: PERSONAL APPLICATIONS ===== -->
+      <section id="personalSection">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">My Applications</h2>
+            <p class="section-subtitle">Track your immigration journey</p>
+          </div>
+          <button class="btn btn--primary" id="addAppBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add Application
+          </button>
+        </div>
+
+        <div id="applicationsContainer">
+          <!-- Application cards rendered here by JS -->
+        </div>
+      </section>
+
+      <!-- ===== PART B: AGGREGATE TIMELINE ===== -->
+      <section class="aggregate-section" id="aggregateSection">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Overall Applicant Timeline</h2>
+            <p class="section-subtitle">Anonymized statistics across all applicants</p>
+          </div>
+        </div>
+
+        <div class="aggregate-filters">
+          <div class="form-group">
+            <label class="form-label" for="filterProgram">Program Type</label>
+            <select class="form-select" id="filterProgram">
+              <option value="">All Programs</option>
+              <option value="NS PNP">NS PNP</option>
+              <option value="AIP">AIP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="filterStream">Stream</label>
+            <select class="form-select" id="filterStream">
+              <option value="">All Streams</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="filterNoc">NOC Code</label>
+            <select class="form-select" id="filterNoc">
+              <option value="">All NOC Codes</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stat-cards" id="statCards">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3 class="chart-card__title">Waiting Time Distribution</h3>
+            <canvas id="waitingChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card__title">Status Distribution</h3>
+            <canvas id="statusChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-card__title">Work Permit Risk Distribution</h3>
+            <canvas id="riskChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ===== APPLICANT TABLE ===== -->
+        <div class="table-section">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">All Applications</h3>
+              <p class="section-subtitle">Anonymized applicant data — filter by NOC, program, stream, or status</p>
+            </div>
+          </div>
+
+          <div class="table-filters">
+            <div class="form-group">
+              <label class="form-label" for="tableFilterNoc">NOC Code</label>
+              <select class="form-select" id="tableFilterNoc">
+                <option value="">All NOC Codes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tableFilterStatus">Status</label>
+              <select class="form-select" id="tableFilterStatus">
+                <option value="">All Statuses</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Pending">Pending</option>
+                <option value="Nominated">Nominated</option>
+                <option value="Endorsed">Endorsed</option>
+                <option value="Refused">Refused</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tableFilterRisk">Risk Level</label>
+              <select class="form-select" id="tableFilterRisk">
+                <option value="">All Risk Levels</option>
+                <option value="green">Safe (>120d)</option>
+                <option value="yellow">Caution (60-120d)</option>
+                <option value="red">Critical (<60d)< /option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tableFilterGraduate">NS Graduate</label>
+              <select class="form-select" id="tableFilterGraduate">
+                <option value="">All Applicants</option>
+                <option value="true">NS Graduate Only</option>
+                <option value="false">Non-Graduates Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table" id="applicantTable">
+              <thead>
+                <tr>
+                  <th data-sort="program_type">Program <span class="sort-icon">↕</span></th>
+                  <th>Stream</th>
+                  <th data-sort="noc_code">NOC <span class="sort-icon">↕</span></th>
+                  <th data-sort="submission_date">Submitted <span class="sort-icon">↕</span></th>
+                  <th data-sort="status">Status <span class="sort-icon">↕</span></th>
+                  <th data-sort="waiting_months">Waiting <span class="sort-icon">↕</span></th>
+                  <th data-sort="days_remaining">WP Days <span class="sort-icon">↕</span></th>
+                  <th>Risk</th>
+                  <th>NS Grad</th>
+                  <th>Case Num</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-pagination" id="tablePagination">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer__text">
+        🍁 IRCC Tracker · Privacy-First Immigration Dashboard<br>
+        Not affiliated with IRCC or the Government of Canada.
+      </p>
+    </footer>
+  </div>
+
+  <!-- ===== APPLICATION FORM MODAL ===== -->
+  <div class="modal-overlay hidden" id="appModal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modalTitle">Add Application</h2>
+        <button class="modal__close" id="modalCloseBtn" type="button">✕</button>
+      </div>
+
+      <form class="modal__form" id="appForm">
+        <input type="hidden" id="editAppId" value="">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="programType">Program Type</label>
+            <select class="form-select" id="programType" required>
+              <option value="">Select program…</option>
+              <option value="NS PNP">NS PNP</option>
+              <option value="AIP">AIP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="stream">Stream</label>
+            <select class="form-select" id="stream" required>
+              <option value="">Select stream…</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="nocCode">NOC Code</label>
+          <input class="form-input" type="text" id="nocCode" placeholder="e.g. 21222" required pattern="[0-9]{4,5}"
+            title="Enter a 4 or 5 digit NOC code">
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="submissionDate">Submission Date</label>
+            <input class="form-input" type="date" id="submissionDate" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="workPermitExpiry">Work Permit Expiry</label>
+            <input class="form-input" type="date" id="workPermitExpiry" required>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group"
+          style="margin-top: 1rem; flex-direction: row; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="nsGraduate" style="width: 20px; height: 20px; cursor: pointer;">
+          <label class="form-label" for="nsGraduate" style="cursor: pointer; margin: 0;">Nova Scotia Graduate</label>
+        </div>
+
+        <div class="form-group checkbox-group"
+          style="margin-top: 1rem; flex-direction: row; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="hasCaseNumber" style="width: 20px; height: 20px; cursor: pointer;">
+          <label class="form-label" for="hasCaseNumber" style="cursor: pointer; margin: 0;">Did you receive a Case
+            Number?</label>
+        </div>
+
+        <div class="form-group hidden" id="caseNumberDateContainer" style="margin-top: 1rem;">
+          <label class="form-label" for="caseNumberDate">Date Case Number Received</label>
+          <input class="form-input" type="date" id="caseNumberDate">
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" for="statusNote">Status Note (Public)</label>
+          <textarea class="form-textarea" id="statusNote" placeholder="e.g. Waiting for nomination, ADR requested..."
+            maxlength="200" rows="2"></textarea>
+          <p class="form-help" style="font-size: 11px; color: var(--text-muted);">This note will be visible to all users
+            in the aggregate table.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="appStatus">Current Status</label>
+          <select class="form-select" id="appStatus" required>
+            <option value="Submitted">Submitted</option>
+            <option value="Pending">Pending</option>
+            <option value="Nominated">Nominated / Endorsed</option>
+            <option value="Refused">Refused</option>
+          </select>
+        </div>
+
+        <div class="modal__actions">
+          <button class="btn btn--secondary" type="button" id="modalCancelBtn">Cancel</button>
+          <button class="btn btn--primary" type="submit" id="modalSubmitBtn">Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- App scripts -->
+  <script src="/js/data.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/charts.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+
+</html>
