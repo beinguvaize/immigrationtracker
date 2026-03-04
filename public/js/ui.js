@@ -292,12 +292,19 @@ const ui = {
                     <span class="status-pill status-pill--${row.status.toLowerCase()}">${row.status}</span>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
+                <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? row.days_remaining + 'd' : '—'}</td>
                 <td>
                     <span class="cell-risk cell-risk--${row.risk_level}">
                         ${this.getRiskLabel(row.risk_level)}
                     </span>
                 </td>
                 <td style="text-align: center;">${row.ns_graduate ? '🎓' : '—'}</td>
+                <td style="text-align: center; font-size:12px;">
+                    ${row.has_case_number ? `<span style="color:var(--clr-green); font-weight:600;">✓</span>${row.case_number_date ? `<div style="font-size:10px;color:var(--text-muted)">${this.formatDate(row.case_number_date)}</div>` : ''}` : '—'}
+                </td>
+                <td style="font-size:12px; color:var(--text-secondary); max-width:140px; white-space:normal; word-break:break-word;">
+                    ${row.status_note || '—'}
+                </td>
             </tr>
         `}).join('');
     },
