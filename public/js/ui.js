@@ -44,7 +44,7 @@ const ui = {
                 <td class="cell-mono">${app.noc_code}</td>
                 <td>${this.formatDate(app.submission_date)}</td>
                 <td>
-                    <div class="status-pill status-pill--${app.status.toLowerCase()}">
+                    <div class="status-pill status-pill--${app.status.toLowerCase().replace(/ /g, '-')}">
                         <div class="status-pill__dot"></div>
                         ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
                     </div>
@@ -99,7 +99,7 @@ const ui = {
                         <span class="app-tag">${app.stream}</span>
                         <span class="app-tag app-tag--noc">NOC ${app.noc_code}</span>
                     </div>
-                    <div class="status-pill status-pill--${app.status.toLowerCase()}">
+                    <div class="status-pill status-pill--${app.status.toLowerCase().replace(/ /g, '-')}">
                         <div class="status-pill__dot"></div>
                         ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
                     </div>
@@ -174,7 +174,21 @@ const ui = {
     },
 
     // ===== STAT CARDS (IRCC Tracker Style) =====
-    renderStatCards(stats) {
+    renderStatCards(stats, programBreakdown) {
+        // Build per-program stacked rows (each program on its own line)
+        const getBreakdownLines = (field) => {
+            if (!programBreakdown || programBreakdown.length === 0) return '<div style="color:var(--text-muted); font-size:13px;">No data</div>';
+            return programBreakdown.map(p => {
+                let val = p[field];
+                if (field === 'pct_nominated') val = (val || 0) + '%';
+                else if (field === 'avg_waiting' || field === 'max_waiting') val = this.formatWaitTime(val);
+                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-subtle);">
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">${p.program_type}</span>
+                    <span style="font-size:var(--fs-lg); font-weight:900; color:var(--text-primary);">${val}</span>
+                </div>`;
+            }).join('');
+        };
+
         return `
             <div class="stat-card stat-card--featured">
                 <div class="stat-card__label">Total Applicants</div>
@@ -188,31 +202,20 @@ const ui = {
             </div>
             <div class="stat-card">
                 <div class="stat-card__label">Avg. Waiting Time</div>
-                <div class="stat-card__value">
-                    ${this.formatWaitTime(stats.avg_waiting_months)}
-                </div>
-                <div class="stat-card__trend trend--up">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
-                    Updated today
+                <div style="margin-top:var(--space-2);">
+                    ${getBreakdownLines('avg_waiting')}
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-card__label">Nomination Success</div>
-                <div class="stat-card__value">
-                    ${stats.pct_nominated}<span class="stat-card__suffix">%</span>
-                </div>
-                <div class="stat-card__trend trend--up">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
-                    Live statistics
+                <div style="margin-top:var(--space-2);">
+                    ${getBreakdownLines('pct_nominated')}
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-card__label">Longest Wait</div>
-                <div class="stat-card__value">
-                    ${this.formatWaitTime(stats.max_waiting_months)}
-                </div>
-                <div class="stat-card__trend">
-                    Across all programs
+                <div style="margin-top:var(--space-2);">
+                    ${getBreakdownLines('max_waiting')}
                 </div>
             </div>
         `;
@@ -233,7 +236,7 @@ const ui = {
             <tr>
                 <td><div class="success-item__icon">🏆</div></td>
                 <td>
-                    <div style="font-weight:600; font-size:13px">${jobTitle}</div>
+                    <div class="job-title-cell" style="font-weight:600; font-size:13px">${jobTitle}</div>
                     <div style="font-size:11px; color:var(--text-muted)">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
                 </td>
                 <td><span class="app-tag">${s.program_type}</span></td>
@@ -284,12 +287,12 @@ const ui = {
                 <td style="font-size: 11px; opacity: 0.8;">${row.stream}</td>
                 <td class="cell-mono">
                     <div style="font-weight:600">${row.noc_code}</div>
-                    ${jobTitle ? `<div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">${jobTitle}</div>` : ''}
+                    ${jobTitle ? `<div class="job-title-cell">${jobTitle}</div>` : ''}
                     ${teer !== null ? `<span style="font-size:10px; padding:1px 6px; border-radius:10px; background:var(--bg-accent-light); color:var(--bg-accent); font-weight:700;">TEER ${teer}</span>` : ''}
                 </td>
                 <td>${this.formatDate(row.submission_date)}</td>
                 <td>
-                    <span class="status-pill status-pill--${row.status.toLowerCase()}">${row.status}</span>
+                    <span class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</span>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
                 <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? row.days_remaining + 'd' : '—'}</td>
@@ -337,11 +340,11 @@ const ui = {
 
     formatWaitTime(months) {
         if (!months && months !== 0) return '—';
-        if (months < 12) return months + ' mo';
-
+        const totalDays = Math.round(months * 30.44);
+        if (totalDays < 30) return totalDays + (totalDays === 1 ? ' day' : ' days');
+        if (months < 12) return Math.round(months) + ' mo';
         const yrs = months / 12;
         if (months % 12 === 0) return Math.floor(yrs) + ' yr';
-
         return yrs.toFixed(1) + ' yr';
     },
 

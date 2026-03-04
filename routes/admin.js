@@ -236,8 +236,8 @@ router.put('/applications/:id', async (req, res) => {
             case_number_date
         } = req.body;
 
-        let nominatedDate = app.nominated_date;
-        if ((status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
+        let nominatedDate = req.body.nominated_date || app.nominated_date;
+        if (!req.body.nominated_date && (status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
             nominatedDate = new Date().toISOString().split('T')[0];
         }
 

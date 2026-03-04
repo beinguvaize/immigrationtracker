@@ -438,11 +438,26 @@
     background: var(--bg-card);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
+    overflow: hidden;
+    max-width: 100%;
     border: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
     min-height: 280px;
-    max-height: 350px;
+    max-height: 380px;
+    /* Slightly increased for more headroom */
+}
+
+@media (max-width: 640px) {
+    .chart-card {
+        min-height: 240px;
+        padding: var(--space-4);
+    }
+}
+
+.chart-card canvas {
+    max-width: 100%;
+    height: auto !important;
 }
 
 .chart-card__title {
@@ -896,9 +911,9 @@
     }
 
     .stats-grid {
-        grid-template-columns: 1fr !important;
-        /* Force 1-column to avoid overlap */
-        gap: var(--space-4);
+        grid-template-columns: repeat(2, 1fr) !important;
+        /* 2x2 grid on mobile */
+        gap: var(--space-3);
     }
 
     .chart-card,
@@ -948,4 +963,144 @@
 .stat-card--featured .stat-card__trend {
     color: var(--text-accent);
     opacity: 0.7;
+}
+
+/* ── Status Pill: Selected for EOI ────────────────── */
+.status-pill--selected-for-eoi {
+    background: var(--pending-bg);
+    color: var(--pending);
+}
+
+/* ── Modal Header Layout ─────────────────────────── */
+.modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+}
+
+.modal__title {
+    margin: 0;
+}
+
+.modal__close {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+    transition: var(--transition-base);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.modal__close:hover {
+    background: var(--danger-bg);
+    color: var(--accent-danger);
+    border-color: var(--accent-danger);
+}
+
+/* ── Badge Card — Force White Text ───────────────── */
+.badge-card,
+.badge-card__title,
+.badge-card__desc {
+    color: #ffffff !important;
+}
+
+/* ── My Applications — Empty State Text Fix ──────── */
+.empty-state__desc {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* ── Mobile: Recent Successes Truncation ─────────── */
+@media (max-width: 768px) {
+    .table-card--successes .data-table--compact td {
+        padding: var(--space-2) var(--space-3);
+    }
+
+    .table-card--successes .data-table--compact td:nth-child(2) div:first-child {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .table-card--successes .data-table--compact td:nth-child(4),
+    .table-card--successes .data-table--compact td:nth-child(5) {
+        display: none;
+    }
+}
+
+/* ── Password Field with Toggle ──────────────────── */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field .form-input {
+    padding-right: 44px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    opacity: 0.5;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-base);
+}
+
+.password-toggle:hover {
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+/* ── Auth Disclaimer ─────────────────────────────── */
+.disclaimer {
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    opacity: 0.7;
+}
+
+/* ── Job Title Truncation ────────────────────────── */
+.job-title-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* ── Responsive Charts ───────────────────────────── */
+@media (max-width: 768px) {
+    .chart-card {
+        padding: var(--space-3);
+        overflow: hidden;
+    }
+
+    .chart-card canvas {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+    }
 }

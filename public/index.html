@@ -40,13 +40,36 @@
       <form class="auth-card__form" id="authForm">
         <div class="form-group">
           <label class="form-label" for="authEmail">Email Address</label>
-          <input class="form-input" type="email" id="authEmail" placeholder="you@example.com" required
+          <input class="form-input" type="email" id="authEmail" placeholder="Enter your email address" required
             autocomplete="email">
         </div>
         <div class="form-group">
           <label class="form-label" for="authPassword">Password</label>
-          <input class="form-input" type="password" id="authPassword" placeholder="Min. 6 characters" required
-            minlength="6" autocomplete="current-password">
+          <div class="password-field">
+            <input class="form-input" type="password" id="authPassword" placeholder="Min. 6 characters" required
+              minlength="6" autocomplete="current-password">
+            <button type="button" class="password-toggle" id="togglePassword" tabindex="-1" title="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                id="eyeIcon">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group hidden" id="confirmPasswordGroup">
+          <label class="form-label" for="authConfirmPassword">Confirm Password</label>
+          <div class="password-field">
+            <input class="form-input" type="password" id="authConfirmPassword" placeholder="Re-enter your password"
+              minlength="6" autocomplete="new-password">
+            <button type="button" class="password-toggle" id="toggleConfirmPassword" tabindex="-1"
+              title="Show password">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
         </div>
         <button class="btn btn--modern btn--full btn--lg" type="submit" id="authSubmitBtn">Sign In</button>
       </form>
@@ -279,7 +302,7 @@
                     <select class="form-select" id="tableFilterStatus">
                       <option value="">All Statuses</option>
                       <option value="Submitted">Submitted</option>
-                      <option value="Pending">Pending</option>
+                      <option value="Selected for EOI">Selected for EOI</option>
                       <option value="Nominated">Nominated</option>
                       <option value="Endorsed">Endorsed</option>
                       <option value="Refused">Refused</option>
@@ -380,7 +403,7 @@
               background:var(--bg-accent-light); border:1px solid var(--bg-accent); font-size:13px;">
               <span id="nocJobTitle" style="font-weight:600; color:var(--text-primary);"></span>
               <span id="nocTeerBadge" style="margin-left:8px; padding:2px 8px; border-radius:20px;
-                background:var(--bg-accent); color:var(--text-accent); font-size:11px; font-weight:700;"></span>
+                background:var(--bg-accent); color:#ffffff; font-size:11px; font-weight:700;"></span>
             </div>
             <div id="nocNotFoundMsg" style="display:none; margin-top:6px; font-size:12px; color:var(--clr-red);">NOC
               code not found — job title will not be pre-filled.</div>
@@ -428,10 +451,15 @@
             <label class="form-label" for="appStatus">Current Status</label>
             <select class="form-select" id="appStatus" required>
               <option value="Submitted">Submitted</option>
-              <option value="Pending">Pending</option>
+              <option value="Selected for EOI">Selected for EOI</option>
               <option value="Nominated">Nominated / Endorsed</option>
               <option value="Refused">Refused</option>
             </select>
+          </div>
+
+          <div class="form-group hidden" id="nominatedDateContainer" style="margin-top: 0;">
+            <label class="form-label" for="nominatedDate">When were you nominated?</label>
+            <input class="form-input" type="date" id="nominatedDate">
           </div>
 
           <div class="modal__actions">
@@ -444,6 +472,9 @@
 
     <!-- Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Vercel Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
 
     <!-- App scripts -->
     <script src="/js/data.js"></script>

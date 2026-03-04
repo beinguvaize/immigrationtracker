@@ -19,7 +19,7 @@ const APP_DATA = {
         ]
     },
 
-    statuses: ['Submitted', 'Pending', 'Nominated', 'Refused'],
+    statuses: ['Submitted', 'Selected for EOI', 'Nominated', 'Refused'],
 
     riskLabels: {
         green: { label: 'Safe', icon: '✓', desc: '> 120 days remaining' },
@@ -30,7 +30,7 @@ const APP_DATA = {
 
     statusColors: {
         'Submitted': '#3b82f6',
-        'Pending': '#f59e0b',
+        'Selected for EOI': '#f59e0b',
         'Nominated': '#22c55e',
         'Endorsed': '#22c55e',
         'Refused': '#ef4444'

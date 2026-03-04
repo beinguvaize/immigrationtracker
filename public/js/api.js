@@ -76,7 +76,9 @@ const api = {
             method: 'DELETE',
             headers: this.getHeaders()
         });
-        return await res.json();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete application');
+        return data;
     },
 
     // Stats (Public/Anonymized)
@@ -154,7 +156,9 @@ const api = {
             method: 'DELETE',
             headers: this.getHeaders()
         });
-        return await res.json();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete application');
+        return data;
     },
 
     // Announcements

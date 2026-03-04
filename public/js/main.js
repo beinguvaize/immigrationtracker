@@ -37,6 +37,8 @@ function initAuth() {
     const authForm = document.getElementById('authForm');
     const authToggleLink = document.getElementById('authToggleLink');
     const logoutBtn = document.getElementById('logoutBtn');
+    const confirmGroup = document.getElementById('confirmPasswordGroup');
+    const confirmInput = document.getElementById('authConfirmPassword');
 
     let isLogin = true;
 
@@ -48,13 +50,47 @@ function initAuth() {
         document.getElementById('authSubmitBtn').innerText = isLogin ? 'Sign In' : 'Sign Up';
         document.getElementById('authToggleText').innerText = isLogin ? "Don't have an account?" : "Already have an account?";
         authToggleLink.innerText = isLogin ? 'Create one' : 'Sign In';
+
+        // Show/hide confirm password
+        confirmGroup.classList.toggle('hidden', isLogin);
+        if (isLogin) {
+            confirmInput.removeAttribute('required');
+            confirmInput.value = '';
+        } else {
+            confirmInput.setAttribute('required', '');
+        }
     });
+
+    // Password visibility toggles
+    function setupPasswordToggle(toggleId, inputId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        if (!toggle || !input) return;
+        toggle.addEventListener('click', () => {
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            toggle.title = isPassword ? 'Hide password' : 'Show password';
+            toggle.style.opacity = isPassword ? '1' : '0.5';
+        });
+    }
+    setupPasswordToggle('togglePassword', 'authPassword');
+    setupPasswordToggle('toggleConfirmPassword', 'authConfirmPassword');
 
     authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('authEmail').value;
         const password = document.getElementById('authPassword').value;
         const errorEl = document.getElementById('authError');
+
+        // Validate password match on signup
+        if (!isLogin) {
+            const confirmPw = confirmInput.value;
+            if (password !== confirmPw) {
+                errorEl.innerText = 'Passwords do not match.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+        }
 
         try {
             const data = isLogin ? await api.login(email, password) : await api.register(email, password);
@@ -152,7 +188,7 @@ async function loadAggregateData() {
         const data = await api.getAggregatedStats({ program_type: program, stream, noc_code: noc });
         state.stats = data;
 
-        document.getElementById('statCards').innerHTML = ui.renderStatCards(data.stats);
+        document.getElementById('statCards').innerHTML = ui.renderStatCards(data.stats, data.programBreakdown);
 
         // Render recent successes (if any)
         const successesContainer = document.getElementById('recentSuccessesContainer');
@@ -295,6 +331,8 @@ window.app = {
                 document.getElementById('submissionDate').value = appData.submission_date;
                 document.getElementById('workPermitExpiry').value = appData.work_permit_expiry;
                 document.getElementById('appStatus').value = appData.status;
+                toggleNominatedDateField();
+                document.getElementById('nominatedDate').value = appData.nominated_date || '';
                 document.getElementById('statusNote').value = appData.status_note || '';
                 document.getElementById('nsGraduate').checked = !!appData.ns_graduate;
 
@@ -307,6 +345,8 @@ window.app = {
             title.innerText = 'Add Application';
             document.getElementById('statusNote').value = '';
             document.getElementById('nsGraduate').checked = false;
+            document.getElementById('nominatedDate').value = '';
+            document.getElementById('nominatedDateContainer').classList.add('hidden');
 
             const hasCaseNumCb = document.getElementById('hasCaseNumber');
             hasCaseNumCb.checked = false;
@@ -344,6 +384,20 @@ document.getElementById('hasCaseNumber').addEventListener('change', (e) => {
     document.getElementById('caseNumberDateContainer').classList.toggle('hidden', !e.target.checked);
     if (!e.target.checked) document.getElementById('caseNumberDate').value = '';
 });
+
+// Show/hide nominated date based on status
+function toggleNominatedDateField() {
+    const status = document.getElementById('appStatus').value;
+    const container = document.getElementById('nominatedDateContainer');
+    if (status === 'Nominated') {
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+        document.getElementById('nominatedDate').value = '';
+    }
+}
+
+document.getElementById('appStatus').addEventListener('change', toggleNominatedDateField);
 
 document.getElementById('programType').addEventListener('change', updateStreamOptionsInForm);
 
@@ -394,7 +448,8 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
         status_note: document.getElementById('statusNote').value,
         ns_graduate: document.getElementById('nsGraduate').checked,
         has_case_number: hasCaseNum,
-        case_number_date: hasCaseNum ? document.getElementById('caseNumberDate').value : null
+        case_number_date: hasCaseNum ? document.getElementById('caseNumberDate').value : null,
+        nominated_date: document.getElementById('appStatus').value === 'Nominated' ? document.getElementById('nominatedDate').value : null
     };
 
     try {

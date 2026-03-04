@@ -219,8 +219,9 @@
                             <select class="form-select" id="appFilterStatus">
                                 <option value="">All Statuses</option>
                                 <option value="Submitted">Submitted</option>
-                                <option value="Pending">Pending</option>
+                                <option value="Selected for EOI">Selected for EOI</option>
                                 <option value="Nominated">Nominated</option>
+                                <option value="Endorsed">Endorsed</option>
                                 <option value="Refused">Refused</option>
                             </select>
                         </div>
@@ -316,11 +317,16 @@
                     <label class="form-label" for="adminStatus">Current Status</label>
                     <select class="form-select" id="adminStatus" required>
                         <option value="Submitted">Submitted</option>
-                        <option value="Pending">Pending</option>
+                        <option value="Selected for EOI">Selected for EOI</option>
                         <option value="Nominated">Nominated</option>
                         <option value="Endorsed">Endorsed</option>
                         <option value="Refused">Refused</option>
                     </select>
+                </div>
+
+                <div class="form-group hidden" id="adminNominatedDateContainer" style="margin-top: 1rem;">
+                    <label class="form-label" for="adminNominatedDate">When were they nominated?</label>
+                    <input class="form-input" type="date" id="adminNominatedDate">
                 </div>
 
                 <div class="form-group">

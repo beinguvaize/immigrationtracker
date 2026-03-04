@@ -32,9 +32,21 @@ router.get('/', async (req, res) => {
         ROUND(AVG(waiting_months), 1) as avg_waiting_months,
         ROUND(MAX(waiting_months), 1) as max_waiting_months,
         ROUND(MIN(waiting_months), 1) as min_waiting_months,
-        ROUND(100.0 * SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) / MAX(COUNT(*), 1), 1) as pct_nominated
+        ROUND(100.0 * SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) / CASE WHEN COUNT(*) = 0 THEN 1 ELSE COUNT(*) END, 1) as pct_nominated
       FROM applications ${whereClause}
     `).get(...params);
+
+    // Per-program breakdown stats
+    const programBreakdown = await prepare(`
+      SELECT
+        program_type,
+        COUNT(*) as total,
+        ROUND(AVG(waiting_months), 1) as avg_waiting,
+        ROUND(MAX(waiting_months), 1) as max_waiting,
+        ROUND(100.0 * SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) / CASE WHEN COUNT(*) = 0 THEN 1 ELSE COUNT(*) END, 1) as pct_nominated
+      FROM applications ${whereClause}
+      GROUP BY program_type
+    `).all(...params);
 
     // Status distribution
     const statusDist = await prepare(`
@@ -102,6 +114,7 @@ router.get('/', async (req, res) => {
 
     res.json({
       stats: stats || { total_applicants: 0, avg_waiting_months: 0, max_waiting_months: 0, min_waiting_months: 0, pct_nominated: 0 },
+      programBreakdown,
       statusDistribution: statusDist,
       riskDistribution: riskDist,
       waitingDistribution: waitingDist,

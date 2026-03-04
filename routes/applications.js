@@ -26,7 +26,7 @@ router.get('/', authenticateToken, async (req, res) => {
 // Create a new application
 router.post('/', authenticateToken, async (req, res) => {
     try {
-        const { program_type, stream, noc_code, submission_date, work_permit_expiry, status, status_note, ns_graduate, has_case_number, case_number_date } = req.body;
+        const { program_type, stream, noc_code, submission_date, work_permit_expiry, status, status_note, ns_graduate, has_case_number, case_number_date, nominated_date } = req.body;
 
         if (!program_type || !stream || !noc_code || !submission_date || !work_permit_expiry) {
             return res.status(400).json({ error: 'All fields are required' });
@@ -34,7 +34,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
         let nominatedDate = null;
         if (status === 'Nominated' || status === 'Endorsed') {
-            nominatedDate = new Date().toISOString().split('T')[0];
+            nominatedDate = nominated_date || new Date().toISOString().split('T')[0];
         }
 
         const waiting = calculateWaitingTime(submission_date, status || 'Submitted', nominatedDate);
@@ -80,11 +80,14 @@ router.put('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Application not found' });
         }
 
-        const { program_type, stream, noc_code, submission_date, work_permit_expiry, status, status_note, ns_graduate, has_case_number, case_number_date } = req.body;
+        const { program_type, stream, noc_code, submission_date, work_permit_expiry, status, status_note, ns_graduate, has_case_number, case_number_date, nominated_date } = req.body;
 
         let nominatedDate = app.nominated_date;
         if ((status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
-            nominatedDate = new Date().toISOString().split('T')[0];
+            nominatedDate = nominated_date || new Date().toISOString().split('T')[0];
+        } else if (status === 'Nominated' || status === 'Endorsed') {
+            // Allow updating the nominated_date if user provides one
+            nominatedDate = nominated_date || app.nominated_date;
         }
 
         const waiting = calculateWaitingTime(
