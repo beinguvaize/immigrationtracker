@@ -280,8 +280,9 @@ const ui = {
             const noc = (typeof lookupNOC === 'function') ? lookupNOC(row.noc_code) : null;
             const jobTitle = noc ? noc.title : '';
             const teer = noc ? noc.teer : null;
+            const tooltip = row.status_note ? `Note: ${row.status_note}` : 'No note provided';
             return `
-            <tr>
+            <tr title="${tooltip.replace(/"/g, '&quot;')}">
                 <td style="font-weight: var(--fw-bold)">${row.program_type}</td>
                 <td style="font-size: 11px; opacity: 0.8;">${row.stream}</td>
                 <td class="cell-mono">

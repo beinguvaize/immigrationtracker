@@ -585,6 +585,16 @@
 .data-table td {
     padding: var(--space-4);
     text-align: left;
+    font-size: var(--fs-sm);
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-primary);
+    cursor: help;
 }
 
 /* ── Buttons ───────────────────────────────────────── */
