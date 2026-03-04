@@ -4,7 +4,14 @@ const adminState = {
     stats: null,
     users: [],
     apps: [],
-    currentPanel: 'overview'
+    currentPanel: 'overview',
+    appsPage: 1
+};
+
+// Global for pagination access
+window.handleAdminPageChange = (page) => {
+    adminState.appsPage = page;
+    loadAdminApps();
 };
 
 // ===== INITIALIZATION =====
@@ -16,7 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    document.getElementById('adminEmail').innerText = adminState.user.email;
+    const emailEl = document.getElementById('adminEmail');
+    const emailSpan = document.getElementById('adminEmailSpan');
+    if (emailEl) emailEl.innerText = adminState.user.email;
+    if (emailSpan) emailSpan.innerText = adminState.user.email;
 
     initAdminNav();
     loadDashboard();
@@ -28,17 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initAdminNav() {
-    const navItems = document.querySelectorAll('.admin-nav-item');
+    const navItems = document.querySelectorAll('.side-nav__link');
     navItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
             const panel = item.dataset.panel;
+            if (!panel) return;
+
+            e.preventDefault();
 
             // UI Update
-            navItems.forEach(i => i.classList.remove('admin-nav-item--active'));
-            item.classList.add('admin-nav-item--active');
+            navItems.forEach(i => i.classList.remove('side-nav__link--active'));
+            item.classList.add('side-nav__link--active');
 
             document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('admin-panel--active'));
-            document.getElementById(`panel${panel.charAt(0).toUpperCase() + panel.slice(1)}`).classList.add('admin-panel--active');
+            const panelEl = document.getElementById(`panel${panel.charAt(0).toUpperCase() + panel.slice(1)}`);
+            if (panelEl) panelEl.classList.add('admin-panel--active');
 
             adminState.currentPanel = panel;
             loadPanelData(panel);
@@ -49,7 +63,10 @@ function initAdminNav() {
 async function loadPanelData(panel) {
     if (panel === 'overview') loadDashboard();
     if (panel === 'users') loadUsers();
-    if (panel === 'apps') loadAdminApps();
+    if (panel === 'apps') {
+        adminState.appsPage = 1;
+        loadAdminApps();
+    }
     if (panel === 'announcements') loadAnnouncements();
 }
 
@@ -85,7 +102,10 @@ function renderProgramChart(dist) {
         return;
     }
 
-    const ctx = document.getElementById('adminProgramChart').getContext('2d');
+    const canvas = document.getElementById('adminProgramChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
     if (programChart) programChart.destroy();
 
     programChart = new Chart(ctx, {
@@ -94,14 +114,15 @@ function renderProgramChart(dist) {
             labels: dist.map(d => d.program_type),
             datasets: [{
                 data: dist.map(d => d.count),
-                backgroundColor: ['#da291c', '#3b82f6', '#f59e0b', '#10b981'],
+                backgroundColor: ['#14532d', '#10b981', '#f59e0b', '#ef4444'],
                 borderWidth: 0
             }]
         },
         options: {
             plugins: {
-                legend: { position: 'bottom', labels: { color: '#94a3b8' } }
-            }
+                legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Outfit' } } }
+            },
+            cutout: '70%'
         }
     });
 }
@@ -116,14 +137,14 @@ async function loadUsers() {
         const tbody = document.getElementById('userTableBody');
         tbody.innerHTML = data.users.map(u => `
             <tr>
-                <td>${u.email}</td>
+                <td style="font-weight: 600;">${u.email}</td>
                 <td>
-                    <select class="form-select btn--sm" onchange="admin.updateUserRole(${u.id}, this.value)">
+                    <select class="form-select btn--sm" style="padding: 2px 8px; font-size: 11px;" onchange="admin.updateUserRole(${u.id}, this.value)">
                         <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
                         <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                     </select>
                 </td>
-                <td>${u.app_count}</td>
+                <td style="text-align: center;">${u.app_count}</td>
                 <td>${ui.formatDate(u.created_at)}</td>
                 <td>
                     <button class="btn btn--danger btn--sm" onclick="admin.deleteUser(${u.id})">Delete</button>
@@ -141,38 +162,37 @@ async function loadAdminApps() {
         const program = document.getElementById('appFilterProgram').value;
         const status = document.getElementById('appFilterStatus').value;
         const search = document.getElementById('appSearch').value;
-        const graduate = document.getElementById('appFilterGraduate').value;
 
         const data = await api.getAdminApplications({
             program_type: program,
             status,
             search,
-            ns_graduate: graduate
+            page: adminState.appsPage,
+            limit: 15
         });
-        adminState.apps = data.applications; // Store for CSV export
+
+        adminState.apps = data.applications;
 
         const tbody = document.getElementById('adminAppTableBody');
         tbody.innerHTML = data.applications.map(a => `
             <tr>
                 <td style="text-align: center;"><input type="checkbox" class="app-checkbox" value="${a.id}" style="cursor: pointer;"></td>
-                <td>${a.user_email}</td>
-                <td>${a.program_type}</td>
+                <td style="font-size: 12px; font-weight: 500;">${a.user_email}</td>
+                <td style="font-size: 11px;">${a.program_type}</td>
                 <td class="cell-mono">${a.noc_code}</td>
-                <td><span class="cell-status status-badge--${a.status.toLowerCase()}">${a.status}</span></td>
+                <td><span class="status-pill status-pill--${a.status.toLowerCase()}">${a.status}</span></td>
                 <td class="cell-mono">${a.waiting_months}m</td>
-                <td><span class="cell-risk cell-risk--${a.risk_level}">${ui.getRiskIcon(a.risk_level)}</span></td>
-                <td style="text-align: center;">${a.ns_graduate ? '🎓 Yes' : 'No'}</td>
-                <td style="text-align: center;">${a.has_case_number ? a.case_number_date : 'No'}</td>
-                <td style="max-width: 150px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${a.status_note || ''}">
-                    ${a.status_note || '—'}
-                </td>
                 <td style="display: flex; gap: 4px;">
-                    <button class="btn btn--secondary btn--sm" style="padding: 4px 8px; font-size: 11px;" onclick="admin.viewDetails(${a.id})">Details</button>
-                    <button class="btn btn--secondary btn--sm" style="padding: 4px 8px; font-size: 11px;" onclick="admin.editApp(${a.id})">Edit</button>
-                    <button class="btn btn--danger btn--sm" style="padding: 4px 8px; font-size: 11px;" onclick="admin.deleteApp(${a.id})">Delete</button>
+                    <button class="btn btn--secondary btn--sm" style="padding: 4px 8px; font-size: 10px;" onclick="admin.viewDetails(${a.id})">Details</button>
+                    <button class="btn btn--secondary btn--sm" style="padding: 4px 8px; font-size: 10px;" onclick="admin.editApp(${a.id})">Edit</button>
+                    <button class="btn btn--danger btn--sm" style="padding: 4px 8px; font-size: 10px;" onclick="admin.deleteApp(${a.id})">Delete</button>
                 </td>
             </tr>
         `).join('');
+
+        // Render Pagination
+        document.getElementById('adminAppPagination').innerHTML = ui.renderPagination(data.pagination, 'handleAdminPageChange');
+
     } catch (err) {
         ui.showToast('Failed to load global applications', 'error');
     }
@@ -194,7 +214,7 @@ async function loadAnnouncements() {
                 <td><strong>${a.message}</strong></td>
                 <td>${ui.formatDate(a.created_at)}</td>
                 <td>
-                    <span class="status-badge status-badge--${a.active ? 'nominated' : 'refused'}" style="cursor: pointer;" onclick="admin.toggleAnnouncement(${a.id}, ${!a.active})">
+                    <span class="status-pill status-pill--${a.active ? 'nominated' : 'refused'}" style="cursor: pointer;" onclick="admin.toggleAnnouncement(${a.id}, ${!a.active})">
                         ${a.active ? 'Active' : 'Inactive'}
                     </span>
                 </td>
@@ -257,18 +277,20 @@ window.admin = {
 
         const content = document.getElementById('adminDetailsContent');
         content.innerHTML = `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                <div><strong>User Email:</strong> <br>${appData.user_email}</div>
-                <div><strong>Submission Date:</strong> <br>${ui.formatDate(appData.submission_date)}</div>
-                <div><strong>Program:</strong> <br>${appData.program_type}</div>
-                <div><strong>Stream:</strong> <br>${appData.stream}</div>
-                <div><strong>NOC Code:</strong> <br>${appData.noc_code}</div>
-                <div><strong>Status:</strong> <br><span class="status-badge status-badge--${appData.status.toLowerCase()}">${appData.status}</span></div>
-                <div><strong>WP Expiry:</strong> <br>${ui.formatDate(appData.work_permit_expiry)} (${appData.days_remaining} days left)</div>
-                <div><strong>NS Graduate:</strong> <br>${appData.ns_graduate ? 'Yes' : 'No'}</div>
-                <div><strong>Case Number:</strong> <br>${appData.has_case_number ? ui.formatDate(appData.case_number_date) : 'No'}</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-lg);">
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">User Account</div><strong>${appData.user_email}</strong></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Program / Stream</div><strong>${appData.program_type}</strong> <br><span style="font-size:12px; opacity:0.8">${appData.stream}</span></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">NOC Code</div><code class="cell-mono">${appData.noc_code}</code></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Submission Date</div><strong>${ui.formatDate(appData.submission_date)}</strong></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">WP Expiry</div><strong>${ui.formatDate(appData.work_permit_expiry)}</strong><br><span style="font-size:11px; color:var(--accent-info)">${appData.days_remaining} days left</span></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Current Status</div><span class="status-pill status-pill--${appData.status.toLowerCase()}">${appData.status}</span></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">NS Graduate</div><strong>${appData.ns_graduate ? '🎓 Yes' : 'No'}</strong></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Case Number</div><strong>${appData.has_case_number ? '✅ ' + ui.formatDate(appData.case_number_date) : '❌ No'}</strong></div>
             </div>
-            ${appData.status_note ? `<div><strong>Note:</strong><br><em style="color: var(--text-secondary);">${appData.status_note}</em></div>` : ''}
+            ${appData.status_note ? `<div style="padding: 1rem; border-left: 4px solid var(--bg-accent); background: var(--bg-accent-light); border-radius: 4px;">
+                <div style="font-size: 11px; color: var(--text-accent); text-transform: uppercase; margin-bottom: 4px;">Public Status Note</div>
+                <em style="color: var(--text-primary); font-style: normal; font-size: 13px;">"${appData.status_note}"</em>
+            </div>` : ''}
         `;
         document.getElementById('adminDetailsModal').classList.remove('hidden');
     },
@@ -316,35 +338,15 @@ window.admin = {
 
 // Filters listeners
 ['userSearch', 'userFilterRole'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => loadUsers());
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => loadUsers());
 });
-['appSearch', 'appFilterProgram', 'appFilterStatus', 'appFilterGraduate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => loadAdminApps());
-});
-
-// Admin Applications Actions
-document.getElementById('selectAllApps')?.addEventListener('change', (e) => {
-    document.querySelectorAll('.app-checkbox').forEach(cb => cb.checked = e.target.checked);
-});
-
-document.getElementById('applyBulkBtn')?.addEventListener('click', async () => {
-    const status = document.getElementById('bulkStatusSelect').value;
-    if (!status) return ui.showToast('Select a status first', 'warning');
-
-    const selected = Array.from(document.querySelectorAll('.app-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (selected.length === 0) return ui.showToast('No applications selected', 'warning');
-
-    if (!confirm(`Update ${selected.length} applications to ${status}?`)) return;
-
-    try {
-        await api.bulkUpdateAdminStatus(selected, status);
-        ui.showToast(`Updated ${selected.length} applications`, 'success');
-        document.getElementById('selectAllApps').checked = false;
-        document.getElementById('bulkStatusSelect').value = '';
+['appSearch', 'appFilterProgram', 'appFilterStatus'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+        adminState.appsPage = 1;
         loadAdminApps();
-    } catch (err) {
-        ui.showToast(err.message, 'error');
-    }
+    });
 });
 
 function updateAdminStreamOptions() {
@@ -425,7 +427,7 @@ document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
         csvRows.push(row.join(','));
     }
 
-    const blob = new Blob([csvRows.join("\\n")], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
@@ -434,4 +436,20 @@ document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+});
+
+// ===== MOBILE NAVIGATION =====
+document.getElementById('mobileNavToggle')?.addEventListener('click', () => {
+    document.querySelector('.sidebar')?.classList.toggle('sidebar--open');
+});
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.getElementById('mobileNavToggle');
+    if (window.innerWidth <= 1024 && sidebar?.classList.contains('sidebar--open')) {
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+            sidebar.classList.remove('sidebar--open');
+        }
+    }
 });

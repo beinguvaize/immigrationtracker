@@ -2,3 +2,6 @@ node_modules/
 .env
 *.log
 out.txt
+data/
+test_*.js
+.DS_Store

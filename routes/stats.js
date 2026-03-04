@@ -90,13 +90,23 @@ router.get('/', async (req, res) => {
       ORDER BY noc_code
     `).all();
 
+    // Recent Successes (Latest Nominated/Endorsed)
+    const recentSuccesses = await prepare(`
+      SELECT program_type, noc_code, nominated_date, status
+      FROM applications
+      WHERE status IN ('Nominated', 'Endorsed')
+      ORDER BY nominated_date DESC, submission_date DESC
+      LIMIT 10
+    `).all();
+
     res.json({
       stats: stats || { total_applicants: 0, avg_waiting_months: 0, max_waiting_months: 0, min_waiting_months: 0, pct_nominated: 0 },
       statusDistribution: statusDist,
       riskDistribution: riskDist,
       waitingDistribution: waitingDist,
       programs,
-      nocCodes
+      nocCodes,
+      recentSuccesses
     });
   } catch (err) {
     console.error('Stats error:', err);

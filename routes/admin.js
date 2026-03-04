@@ -217,6 +217,12 @@ router.get('/applications', async (req, res) => {
 router.put('/applications/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        const app = await prepare('SELECT status, nominated_date FROM applications WHERE id = ?').get(parseInt(id));
+
+        if (!app) {
+            return res.status(404).json({ error: 'Application not found' });
+        }
+
         const {
             program_type,
             stream,
@@ -230,6 +236,11 @@ router.put('/applications/:id', async (req, res) => {
             case_number_date
         } = req.body;
 
+        let nominatedDate = app.nominated_date;
+        if ((status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
+            nominatedDate = new Date().toISOString().split('T')[0];
+        }
+
         const result = await prepare(`
             UPDATE applications 
             SET program_type = ?, 
@@ -238,6 +249,7 @@ router.put('/applications/:id', async (req, res) => {
                 submission_date = ?, 
                 work_permit_expiry = ?, 
                 status = ?, 
+                nominated_date = ?,
                 status_note = ?, 
                 ns_graduate = ?,
                 has_case_number = ?,
@@ -245,7 +257,7 @@ router.put('/applications/:id', async (req, res) => {
             WHERE id = ?
         `).run(
             program_type, stream, noc_code, submission_date, work_permit_expiry,
-            status, status_note, ns_graduate ? 1 : 0, has_case_number ? 1 : 0, case_number_date,
+            status, nominatedDate, status_note, ns_graduate ? 1 : 0, has_case_number ? 1 : 0, case_number_date,
             parseInt(id)
         );
 
@@ -271,8 +283,16 @@ router.put('/applications/bulk-status', async (req, res) => {
             return res.status(400).json({ error: 'Invalid status' });
         }
 
+        let setClause = 'status = ?';
+        const params = [status];
+
+        if (status === 'Nominated' || status === 'Endorsed') {
+            setClause += ', nominated_date = ?';
+            params.push(new Date().toISOString().split('T')[0]);
+        }
+
         const placeholders = appIds.map(() => '?').join(',');
-        await prepare(`UPDATE applications SET status = ? WHERE id IN (${placeholders})`).run(status, ...appIds);
+        await prepare(`UPDATE applications SET ${setClause} WHERE id IN (${placeholders})`).run(...params, ...appIds);
 
         res.json({ message: 'Applications updated successfully' });
     } catch (err) {

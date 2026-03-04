@@ -1,11 +1,12 @@
 {
-  "name": "ircc-tracker",
+  "name": "immigration-tracker",
   "version": "1.0.0",
   "description": "Privacy-first immigration dashboard for NS PNP and AIP applicants",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "vercel-build": "echo 'No build step required'"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",

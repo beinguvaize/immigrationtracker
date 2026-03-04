@@ -14,89 +14,183 @@ body {
     font-size: var(--fs-base);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     min-height: 100vh;
+}
+
+/* ── IRCC Tracker Layout ────────────────────────────── */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    padding: var(--space-4);
+    gap: var(--space-4);
+    background: var(--bg-primary);
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-card);
+    flex-shrink: 0;
+}
+
+.main-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+/* Header Styling */
+.header {
+    height: var(--header-height);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    padding: 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-card);
+}
+
+/* Content Area Styling */
+.content-area {
+    flex-grow: 1;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-card);
+    overflow-y: auto;
     position: relative;
 }
 
-/* ── Nova Scotia Flag Background ────────────────────── */
-/* Visible watermark using the NS flag as a subtle branded background */
-body::before {
+/* ── Branding ──────────────────────────────────────── */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-10);
+}
+
+.brand__logo {
+    width: 44px;
+    height: 44px;
+    background: var(--accent-green);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text-on-accent);
+}
+
+.brand__name {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    color: var(--text-primary);
+    letter-spacing: -0.05em;
+    font-family: var(--font-heading);
+}
+
+/* ── Typography Utility ────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+}
+
+.text-muted {
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+}
+
+/* ── NS Flag Watermark Fix ────────────────────────── */
+/* Re-applying the NS flag as a very subtle branded watermark in the main content area */
+.content-area::before {
     content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
     background-image: url('../assets/ns_flag.png');
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 60%;
-    opacity: 0.08;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.05;
     pointer-events: none;
     z-index: 0;
 }
 
-/* Admin theme hides the flag */
-body.admin-theme::before {
-    display: none;
-}
-
-/* Ensure all body content renders above the flag watermark */
-body>* {
+.content-area>* {
     position: relative;
     z-index: 1;
 }
 
-/* ── Links ──────────────────────────────────────────── */
-a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-}
+/* ── Responsive & Global Layout Fixes ──────────────── */
+@media (max-width: 1024px) {
+    .app-container {
+        padding: 0;
+        gap: 0;
+        flex-direction: column;
+    }
 
-a:hover {
-    color: var(--accent-blue-hover);
-}
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        z-index: 1010;
+        border-radius: 0;
+        transition: var(--transition-base);
+        height: 100vh;
+        width: 280px;
+        box-shadow: none;
+    }
 
-/* ── Utility ────────────────────────────────────────── */
-.hidden {
-    display: none !important;
-}
+    .sidebar--open {
+        left: 0;
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.1);
+    }
 
-/* ── Scrollbar ──────────────────────────────────────── */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
+    .main-wrapper {
+        gap: 0;
+        padding-top: var(--header-height);
+    }
 
-::-webkit-scrollbar-track {
-    background: transparent;
-}
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1005;
+        border-radius: 0;
+        height: var(--header-height);
+        padding: 0 var(--space-4);
+        box-shadow: var(--shadow-sm);
+    }
 
-::-webkit-scrollbar-thumb {
-    background: var(--border-medium);
-    border-radius: 10px;
-}
+    .content-area {
+        border-radius: 0;
+        padding: var(--space-4);
+        background: var(--bg-primary);
+        box-shadow: none;
+        margin-top: 0;
+    }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
-/* ── Layout ─────────────────────────────────────────── */
-.container {
-    max-width: var(--container-max);
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-.main-content {
-    padding: 2rem 0;
-}
-
-/* ── Selection ──────────────────────────────────────── */
-::selection {
-    background: var(--accent-blue-alpha);
-    color: var(--accent-blue);
+    .mobile-nav-toggle {
+        display: flex !important;
+    }
 }

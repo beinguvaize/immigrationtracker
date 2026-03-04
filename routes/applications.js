@@ -32,12 +32,17 @@ router.post('/', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
-        const waiting = calculateWaitingTime(submission_date, status || 'Submitted', null);
+        let nominatedDate = null;
+        if (status === 'Nominated' || status === 'Endorsed') {
+            nominatedDate = new Date().toISOString().split('T')[0];
+        }
+
+        const waiting = calculateWaitingTime(submission_date, status || 'Submitted', nominatedDate);
         const countdown = calculateWorkPermitCountdown(work_permit_expiry);
 
         const result = await prepare(`
-      INSERT INTO applications (user_id, program_type, stream, noc_code, submission_date, work_permit_expiry, status, waiting_months, days_remaining, risk_level, status_note, ns_graduate, has_case_number, case_number_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO applications (user_id, program_type, stream, noc_code, submission_date, work_permit_expiry, status, nominated_date, waiting_months, days_remaining, risk_level, status_note, ns_graduate, has_case_number, case_number_date)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
             req.user.id,
             program_type,
@@ -46,6 +51,7 @@ router.post('/', authenticateToken, async (req, res) => {
             submission_date,
             work_permit_expiry,
             status || 'Submitted',
+            nominatedDate,
             waiting.totalMonths,
             countdown.daysRemaining,
             countdown.riskLevel,

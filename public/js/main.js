@@ -76,16 +76,17 @@ function initAuth() {
 function showApp() {
     document.getElementById('authScreen').classList.add('hidden');
     document.getElementById('appLayout').classList.remove('hidden');
-    document.getElementById('navUserEmail').innerText = state.user.email;
+
+    // Populate Header Profile
+    const userNameEl = document.getElementById('navUserName');
+    const userEmailEl = document.getElementById('navUserEmailSpan');
+    if (userNameEl) userNameEl.innerText = state.user.email.split('@')[0];
+    if (userEmailEl) userEmailEl.innerText = state.user.email;
 
     // Admin link
     if (state.user.role === 'admin') {
         const adminLink = document.getElementById('adminLink');
-        const roleBadge = document.getElementById('navRoleBadge');
-        adminLink.classList.remove('hidden');
-        roleBadge.classList.remove('hidden');
-        roleBadge.innerText = 'Admin';
-        roleBadge.classList.add('role-badge--admin');
+        if (adminLink) adminLink.classList.remove('hidden');
     }
 
     // Load data
@@ -138,7 +139,7 @@ function renderApplications() {
         `;
         return;
     }
-    container.innerHTML = state.apps.map(a => ui.renderApplicationCard(a)).join('');
+    container.innerHTML = ui.renderMyApplicationsTable(state.apps);
 }
 
 // ===== AGGREGATE STATS =====
@@ -152,13 +153,24 @@ async function loadAggregateData() {
         state.stats = data;
 
         document.getElementById('statCards').innerHTML = ui.renderStatCards(data.stats);
-        charts.updateCharts(data);
+
+        // Render recent successes (if any)
+        const successesContainer = document.getElementById('recentSuccessesContainer');
+        if (successesContainer) {
+            successesContainer.innerHTML = ui.renderRecentSuccesses(data.recentSuccesses);
+        }
+
+        if (window.charts && charts.updateCharts) {
+            charts.updateCharts(data);
+        }
 
         // Populate NOC filter if not already populated
-        populateNocFilter(data.nocCodes, 'filterNoc');
-        populateNocFilter(data.nocCodes, 'tableFilterNoc');
+        if (typeof populateNocFilter === 'function') {
+            populateNocFilter(data.nocCodes, 'filterNoc');
+            populateNocFilter(data.nocCodes, 'tableFilterNoc');
+        }
     } catch (err) {
-        console.error(err);
+        console.error('Failed to load aggregated data', err);
     }
 }
 
@@ -373,5 +385,21 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
         loadTableData();
     } catch (err) {
         ui.showToast(err.message, 'error');
+    }
+});
+
+// ===== MOBILE NAVIGATION =====
+document.getElementById('mobileNavToggle')?.addEventListener('click', () => {
+    document.querySelector('.sidebar')?.classList.toggle('sidebar--open');
+});
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.getElementById('mobileNavToggle');
+    if (window.innerWidth <= 1024 && sidebar?.classList.contains('sidebar--open')) {
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+            sidebar.classList.remove('sidebar--open');
+        }
     }
 });
