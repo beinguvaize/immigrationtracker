@@ -347,8 +347,10 @@ const ui = {
 
     formatDate(dateStr) {
         if (!dateStr) return '—';
+        // Force local time by adding T00:00:00 to YYYY-MM-DD strings
+        const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateStr).toLocaleDateString(undefined, options);
+        return date.toLocaleDateString(undefined, options);
     },
 
     // ===== ADMIN UI =====
