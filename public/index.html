@@ -261,7 +261,7 @@
               </div>
 
               <!-- Stat Cards -->
-              <div class="stat-cards" id="statCards">
+              <div class="stat-cards" id="aggregateStatCards">
                 <!-- Rendered by JS -->
               </div>
 
@@ -269,15 +269,21 @@
               <div class="charts-grid">
                 <div class="chart-card">
                   <h3 class="chart-card__title">Waiting Time Distribution</h3>
-                  <canvas id="waitingChart"></canvas>
+                  <div class="chart-container">
+                    <canvas id="waitingChart"></canvas>
+                  </div>
                 </div>
                 <div class="chart-card">
                   <h3 class="chart-card__title">Status Distribution</h3>
-                  <canvas id="statusChart"></canvas>
+                  <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                  </div>
                 </div>
                 <div class="chart-card">
                   <h3 class="chart-card__title">Work Permit Risk Distribution</h3>
-                  <canvas id="riskChart"></canvas>
+                  <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                  </div>
                 </div>
               </div>
 

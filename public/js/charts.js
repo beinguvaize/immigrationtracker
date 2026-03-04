@@ -10,7 +10,7 @@ window.charts = {
         if (typeof Chart === 'undefined') return {};
         return {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     labels: {
@@ -125,7 +125,7 @@ window.charts = {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 cutout: '60%',
                 plugins: {
                     legend: {

@@ -188,7 +188,10 @@ async function loadAggregateData() {
         const data = await api.getAggregatedStats({ program_type: program, stream, noc_code: noc });
         state.stats = data;
 
-        document.getElementById('statCards').innerHTML = ui.renderStatCards(data.stats, data.programBreakdown);
+        const aggStatsEl = document.getElementById('aggregateStatCards');
+        if (aggStatsEl) {
+            aggStatsEl.innerHTML = ui.renderStatCards(data.stats, data.programBreakdown);
+        }
 
         // Render recent successes (if any)
         const successesContainer = document.getElementById('recentSuccessesContainer');

@@ -119,6 +119,8 @@ function renderProgramChart(dist) {
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Outfit' } } }
             },

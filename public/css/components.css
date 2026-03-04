@@ -412,6 +412,14 @@
 @media (max-width: 1100px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .dashboard-grid>* {
+        max-width: 100% !important;
+        min-width: 0 !important;
     }
 }
 
@@ -431,6 +439,28 @@
 @media (max-width: 640px) {
     .charts-grid {
         grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .charts-grid>* {
+        min-width: 0;
+        /* Important for flex/grid items with canvas */
+    }
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    /* Base height for desktop */
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 220px;
+        /* Reduced height for mobile */
     }
 }
 
@@ -443,22 +473,18 @@
     border: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
-    min-height: 280px;
-    max-height: 380px;
 }
 
 @media (max-width: 640px) {
     .chart-card {
-        min-height: 180px;
-        /* Further reduced for mobile */
-        max-height: 280px;
         padding: var(--space-2) var(--space-3);
     }
 }
 
 .chart-card canvas {
-    max-width: 100%;
-    height: auto !important;
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .chart-card__title {
@@ -599,6 +625,41 @@
 
 .btn--full {
     width: 100%;
+}
+
+.aggregate-filters,
+.table-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    background: var(--bg-card);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-6);
+    min-width: 0;
+}
+
+.aggregate-filters>*,
+.table-filters>* {
+    flex: 1;
+    min-width: 200px;
+    /* Allow wrapping */
+}
+
+@media (max-width: 640px) {
+
+    .aggregate-filters,
+    .table-filters {
+        padding: var(--space-3);
+        gap: var(--space-2);
+    }
+
+    .aggregate-filters>*,
+    .table-filters>* {
+        min-width: 140px;
+        /* Denser on mobile */
+    }
 }
 
 .btn--lg {
@@ -933,27 +994,8 @@
         /* Hide Stream and WP Risk on small mobile to keep it clean */
     }
 
-    /* Admin/Dashboard board responsiveness */
-    .dashboard-grid {
-        grid-template-columns: 1fr !important;
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-4);
-    }
+    /* Dashboard/Stats Board responsiveness handled in primary layout section */
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        /* 2x2 grid on mobile */
-        gap: var(--space-3);
-    }
-
-    .chart-card,
-    .table-card,
-    .widget-card {
-        height: auto !important;
-        min-height: auto !important;
-        margin-bottom: var(--space-4);
-    }
 }
 
 
@@ -1113,13 +1155,21 @@
 
 /* ── Job Title Truncation ────────────────────────── */
 .job-title-cell {
-    max-width: 200px;
+    max-width: 180px;
+    /* Reduced to ensure it fits mobile */
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 11px;
     color: var(--text-secondary);
     margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+    .job-title-cell {
+        max-width: 120px;
+    }
 }
 
 /* ── Pagination Redesign ─────────────────────────── */
@@ -1191,16 +1241,5 @@
     }
 }
 
-/* ── Responsive Charts & Overrides ───────────────── */
-@media (max-width: 768px) {
-    .chart-card {
-        padding: var(--space-3);
-        overflow: hidden;
-    }
-
-    .chart-card canvas {
-        max-width: 100% !important;
-        width: 100% !important;
-        height: auto !important;
-    }
-}
+/* ── Final Custom Overrides ───────────────────────── */
+/* Removed redundant/conflicting mobile overrides to ensure primary responsive logic is used. */
