@@ -357,6 +357,29 @@ function updateStreamOptionsInForm() {
     streamSelect.innerHTML = options;
 }
 
+// ===== NOC CODE LIVE LOOKUP =====
+document.getElementById('nocCode').addEventListener('input', function () {
+    const code = this.value.trim();
+    const badge = document.getElementById('nocLookupBadge');
+    const titleEl = document.getElementById('nocJobTitle');
+    const teerEl = document.getElementById('nocTeerBadge');
+    const notFound = document.getElementById('nocNotFoundMsg');
+
+    badge.style.display = 'none';
+    notFound.style.display = 'none';
+
+    if (code.length === 5 && typeof lookupNOC === 'function') {
+        const result = lookupNOC(code);
+        if (result) {
+            titleEl.textContent = result.title;
+            teerEl.textContent = `TEER ${result.teer}`;
+            badge.style.display = 'block';
+        } else {
+            notFound.style.display = 'block';
+        }
+    }
+});
+
 document.getElementById('appForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('editAppId').value;

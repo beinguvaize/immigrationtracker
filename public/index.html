@@ -375,7 +375,15 @@
           <div class="form-group">
             <label class="form-label" for="nocCode">NOC Code</label>
             <input class="form-input" type="text" id="nocCode" placeholder="e.g. 21222" required pattern="[0-9]{4,5}"
-              title="Enter a 4 or 5 digit NOC code">
+              title="Enter a 4 or 5 digit NOC code" maxlength="5" autocomplete="off">
+            <div id="nocLookupBadge" style="display:none; margin-top:6px; padding:8px 12px; border-radius:8px;
+              background:var(--bg-accent-light); border:1px solid var(--bg-accent); font-size:13px;">
+              <span id="nocJobTitle" style="font-weight:600; color:var(--text-primary);"></span>
+              <span id="nocTeerBadge" style="margin-left:8px; padding:2px 8px; border-radius:20px;
+                background:var(--bg-accent); color:var(--text-accent); font-size:11px; font-weight:700;"></span>
+            </div>
+            <div id="nocNotFoundMsg" style="display:none; margin-top:6px; font-size:12px; color:var(--clr-red);">NOC
+              code not found — job title will not be pre-filled.</div>
           </div>
 
           <div class="form-grid">
@@ -442,6 +450,7 @@
     <script src="/js/api.js"></script>
     <script src="/js/charts.js"></script>
     <script src="/js/ui.js"></script>
+    <script src="/js/noc-data.js"></script>
     <script src="/js/main.js"></script>
 </body>
 
