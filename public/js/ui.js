@@ -177,32 +177,31 @@ const ui = {
     renderStatCards(stats, programBreakdown) {
         // Build per-program stacked rows (each program on its own line)
         const getBreakdownLines = (field) => {
-            if (!programBreakdown || programBreakdown.length === 0) return '<div style="color:var(--text-muted); font-size:13px;">No data</div>';
+            if (!programBreakdown || programBreakdown.length === 0) return '<div style="color:var(--text-muted); font-size:12px;">No data</div>';
             return programBreakdown.map(p => {
                 let val = p[field];
                 if (field === 'pct_nominated') val = (val || 0) + '%';
                 else if (field === 'avg_waiting' || field === 'max_waiting') val = this.formatWaitTime(val);
-                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-subtle);">
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:600;">${p.program_type}</span>
-                    <span style="font-size:var(--fs-lg); font-weight:900; color:var(--text-primary);">${val}</span>
+                return `<div style="display:flex; flex-direction:column; align-items:center; padding:4px 0; border-top:1px solid rgba(0,0,0,0.05); width:100%;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${p.program_type}</div>
+                    <div style="font-size:var(--fs-md); font-weight:800; color:var(--text-primary);">${val}</div>
                 </div>`;
             }).join('');
         };
 
         return `
-            <div class="stat-card stat-card--featured">
+            <div class="stat-card stat-card--total">
                 <div class="stat-card__label">Total Applicants</div>
-                <div class="stat-card__value" style="color: var(--bg-accent)">
+                <div class="stat-card__value" style="color: var(--bg-accent); font-size: var(--fs-3xl); margin: var(--space-2) 0;">
                     ${stats.total_applicants}
                 </div>
-                <div class="stat-card__trend trend--up">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                <div class="stat-card__trend trend--up" style="font-size:11px; color:var(--text-muted);">
                     Increased from last month
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-card__label">Avg. Waiting Time</div>
-                <div style="margin-top:var(--space-2);">
+                <div style="margin-top:var(--space-1); width:100%;">
                     ${getBreakdownLines('avg_waiting')}
                 </div>
             </div>
@@ -304,9 +303,6 @@ const ui = {
                 <td style="text-align: center;">${row.ns_graduate ? '🎓' : '—'}</td>
                 <td style="text-align: center; font-size:12px;">
                     ${row.has_case_number ? `<span style="color:var(--clr-green); font-weight:600;">✓</span>${row.case_number_date ? `<div style="font-size:10px;color:var(--text-muted)">${this.formatDate(row.case_number_date)}</div>` : ''}` : '—'}
-                </td>
-                <td style="font-size:12px; color:var(--text-secondary); max-width:140px; white-space:normal; word-break:break-word;">
-                    ${row.status_note || '—'}
                 </td>
             </tr>
         `}).join('');
