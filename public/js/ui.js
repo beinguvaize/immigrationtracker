@@ -190,9 +190,9 @@ const ui = {
         };
 
         return `
-            <div class="stat-card stat-card--total">
+            <div class="stat-card stat-card--featured">
                 <div class="stat-card__label">Total Applicants</div>
-                <div class="stat-card__value" style="color: var(--bg-accent); font-size: var(--fs-3xl); margin: var(--space-2) 0;">
+                <div class="stat-card__value" style="font-size: var(--fs-3xl); margin: var(--space-2) 0;">
                     ${stats.total_applicants}
                 </div>
                 <div class="stat-card__trend trend--up" style="font-size:11px; color:var(--text-muted);">
@@ -362,10 +362,10 @@ const ui = {
         ];
 
         return items.map((item, idx) => `
-            <div class="stat-card ${idx === 0 ? 'stat-card--featured' : ''}" ${idx === 0 ? 'style="background: var(--bg-accent-light); border-color: var(--bg-accent)"' : ''}>
-                <div class="stat-card__label" ${idx === 0 ? 'style="color: var(--bg-accent)"' : ''}>${item.label}</div>
-                <div class="stat-card__value" ${idx === 0 ? 'style="color: var(--bg-accent)"' : ''}>${item.value}</div>
-                <div class="stat-card__trend" ${idx === 0 ? 'style="color: var(--bg-accent); opacity: 0.8"' : ''}>${item.trend}</div>
+            <div class="stat-card ${idx === 0 ? 'stat-card--featured' : ''}">
+                <div class="stat-card__label">${item.label}</div>
+                <div class="stat-card__value">${item.value}</div>
+                <div class="stat-card__trend">${item.trend}</div>
             </div>
         `).join('');
     }
