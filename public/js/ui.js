@@ -39,7 +39,7 @@ const ui = {
                 <div class="waiting-display">
                     <div class="waiting-display__label">You have been waiting for</div>
                     <div class="waiting-display__value">${app.waiting_months}</div>
-                    <div class="waiting-display__unit">8.6 months</div>
+                    <div class="waiting-display__unit">Total Months</div>
                     
                     <div class="waiting-display__breakdown">
                         <div class="waiting-display__item">
