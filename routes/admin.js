@@ -308,12 +308,17 @@ router.delete('/applications/:id', async (req, res) => {
     try {
         const { id } = req.params;
         console.log(`[ADMIN DELETE APP] Attempting to delete app ${id}`);
-        const result = await prepare('DELETE FROM applications WHERE id = ?').run(parseInt(id));
-        console.log(`[ADMIN DELETE APP] Result:`, result);
 
-        if (result.changes === 0) {
+        // First verify the app exists
+        const app = await prepare('SELECT id FROM applications WHERE id = ?').get(parseInt(id));
+        console.log(`[ADMIN DELETE APP] App lookup result:`, app);
+
+        if (!app) {
             return res.status(404).json({ error: 'Application not found' });
         }
+
+        const result = await prepare('DELETE FROM applications WHERE id = ?').run(parseInt(id));
+        console.log(`[ADMIN DELETE APP] Delete result:`, JSON.stringify(result));
 
         saveDB();
         res.json({ message: 'Application deleted' });
