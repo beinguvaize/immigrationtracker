@@ -133,6 +133,35 @@ function showApp() {
     loadAnnouncement();
     initFilters();
     initTableControls();
+    initNavigation();
+}
+
+function initNavigation() {
+    const navLinks = document.querySelectorAll('.side-nav__link[data-panel]');
+    const panels = document.querySelectorAll('.app-panel');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetPanelId = link.getAttribute('data-panel');
+            if (!targetPanelId) return;
+
+            // Update active link
+            navLinks.forEach(l => l.classList.remove('side-nav__link--active'));
+            link.classList.add('side-nav__link--active');
+
+            // Switch panels
+            panels.forEach(panel => {
+                const isTarget = panel.id === `panel${targetPanelId.charAt(0).toUpperCase() + targetPanelId.slice(1)}`;
+                panel.classList.toggle('app-panel--active', isTarget);
+            });
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 1024) {
+                toggleSidebar();
+            }
+        });
+    });
 }
 
 async function loadAnnouncement() {
@@ -258,26 +287,32 @@ async function loadTableData() {
 function initFilters() {
     const filterIds = ['filterProgram', 'filterStream', 'filterNoc'];
     filterIds.forEach(id => {
-        document.getElementById(id).addEventListener('change', () => {
-            if (id === 'filterProgram') updateStreamOptions();
-            loadAggregateData();
-            loadTableData(); // Table also depends on main filters
-        });
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => {
+                if (id === 'filterProgram') updateStreamOptions();
+                loadAggregateData();
+                loadTableData();
+            });
+        }
     });
 
     const tableFilterIds = ['tableFilterNoc', 'tableFilterStatus', 'tableFilterRisk', 'tableFilterGraduate'];
     tableFilterIds.forEach(id => {
-        document.getElementById(id).addEventListener('change', (e) => {
-            const field = id.replace('tableFilter', '').toLowerCase();
-            if (field === 'graduate') {
-                state.table.filters.ns_graduate = e.target.value;
-            } else {
-                const key = field === 'noc' ? 'noc_code' : field === 'risk' ? 'risk_level' : field;
-                state.table.filters[key] = e.target.value;
-            }
-            state.table.page = 1;
-            loadTableData();
-        });
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', (e) => {
+                const field = id.replace('tableFilter', '').toLowerCase();
+                if (field === 'graduate') {
+                    state.table.filters.ns_graduate = e.target.value;
+                } else {
+                    const key = field === 'noc' ? 'noc_code' : field === 'risk' ? 'risk_level' : field;
+                    state.table.filters[key] = e.target.value;
+                }
+                state.table.page = 1;
+                loadTableData();
+            });
+        }
     });
 }
 
@@ -362,8 +397,10 @@ window.app = {
     },
 
     async deleteApplication(id) {
+        console.log(`[APP] deleteApplication called for id: ${id}`);
         if (!confirm('Are you sure you want to delete this application?')) return;
         try {
+            console.log(`[APP] Sending delete request for id: ${id}`);
             await api.deleteApplication(id);
             ui.showToast('Application deleted', 'success');
             loadUserData();

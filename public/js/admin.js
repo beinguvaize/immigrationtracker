@@ -68,6 +68,9 @@ async function loadPanelData(panel) {
         loadAdminApps();
     }
     if (panel === 'announcements') loadAnnouncements();
+    if (panel === 'help') {
+        // No extra data needed for help letter
+    }
 }
 
 // ===== DASHBOARD OVERVIEW =====
@@ -254,8 +257,10 @@ window.admin = {
         }
     },
     async deleteUser(id) {
+        console.log(`[ADMIN] deleteUser called for user_id: ${id}`);
         if (!confirm('Delete user and all their applications?')) return;
         try {
+            console.log(`[ADMIN] Sending delete user request for user_id: ${id}`);
             await api.deleteAdminUser(id);
             ui.showToast('User deleted', 'success');
             loadUsers();
@@ -264,8 +269,10 @@ window.admin = {
         }
     },
     async deleteApp(id) {
+        console.log(`[ADMIN] deleteApp called for id: ${id}`);
         if (!confirm('Delete this application record?')) return;
         try {
+            console.log(`[ADMIN] Sending delete app request for id: ${id}`);
             await api.deleteAdminApplication(id);
             ui.showToast('Application deleted', 'success');
             loadAdminApps();
@@ -329,8 +336,10 @@ window.admin = {
         }
     },
     async deleteAnnouncement(id) {
+        console.log(`[ADMIN] deleteAnnouncement called for id: ${id}`);
         if (!confirm('Delete this announcement permanently?')) return;
         try {
+            console.log(`[ADMIN] Sending delete announcement request for id: ${id}`);
             await api.deleteAdminAnnouncement(id);
             ui.showToast('Announcement deleted', 'success');
             loadAnnouncements();

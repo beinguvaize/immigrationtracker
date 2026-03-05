@@ -1301,3 +1301,25 @@
 
 /* ── Final Custom Overrides ───────────────────────── */
 /* Removed redundant/conflicting mobile overrides to ensure primary responsive logic is used. */
+.app-panel {
+    display: none;
+    animation: panelFadeIn 0.3s ease-out;
+}
+
+.app-panel--active {
+    display: block;
+}
+
+@keyframes panelFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-panel {
+    display: none;
+    animation: panelFadeIn 0.3s ease-out;
+}
+
+.admin-panel--active {
+    display: block;
+}

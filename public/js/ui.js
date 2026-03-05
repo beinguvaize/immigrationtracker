@@ -356,8 +356,19 @@ const ui = {
 
     formatDate(dateStr) {
         if (!dateStr) return '—';
-        // Force local time by adding T00:00:00 to YYYY-MM-DD strings
-        const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+
+        let normalized = dateStr;
+        if (dateStr.includes(' ')) {
+            // Convert "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SS"
+            normalized = dateStr.replace(' ', 'T');
+        } else if (!dateStr.includes('T')) {
+            // Force local time for "YYYY-MM-DD"
+            normalized = dateStr + 'T00:00:00';
+        }
+
+        const date = new Date(normalized);
+        if (isNaN(date.getTime())) return 'Invalid Date';
+
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return date.toLocaleDateString(undefined, options);
     },

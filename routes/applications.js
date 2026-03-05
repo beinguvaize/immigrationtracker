@@ -135,7 +135,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(`[DELETE APP] User ${req.user.id} attempting to delete app ${id}`);
         const result = await prepare('DELETE FROM applications WHERE id = ? AND user_id = ?').run(parseInt(id), req.user.id);
+        console.log(`[DELETE APP] Result:`, result);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: 'Application not found' });

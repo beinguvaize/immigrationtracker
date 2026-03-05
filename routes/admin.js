@@ -125,6 +125,7 @@ router.put('/users/:id/role', async (req, res) => {
 router.delete('/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(`[ADMIN DELETE USER] Attempting to delete user ${id}`);
 
         if (parseInt(id) === req.user.id) {
             return res.status(400).json({ error: 'Cannot delete yourself' });
@@ -133,6 +134,7 @@ router.delete('/users/:id', async (req, res) => {
         // Delete user's applications first
         await prepare('DELETE FROM applications WHERE user_id = ?').run(parseInt(id));
         const result = await prepare('DELETE FROM users WHERE id = ?').run(parseInt(id));
+        console.log(`[ADMIN DELETE USER] Result:`, result);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: 'User not found' });
@@ -303,7 +305,9 @@ router.put('/applications/bulk-status', async (req, res) => {
 router.delete('/applications/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(`[ADMIN DELETE APP] Attempting to delete app ${id}`);
         const result = await prepare('DELETE FROM applications WHERE id = ?').run(parseInt(id));
+        console.log(`[ADMIN DELETE APP] Result:`, result);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: 'Application not found' });
