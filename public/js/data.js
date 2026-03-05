@@ -5,6 +5,7 @@ const APP_DATA = {
     streams: {
         'NS PNP': [
             'Skilled Worker',
+            'Express Entry',
             'International Graduate in Demand',
             'Physician',
             'Entrepreneur',
