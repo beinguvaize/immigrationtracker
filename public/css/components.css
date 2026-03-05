@@ -1026,6 +1026,91 @@
     font-size: var(--fs-lg);
 }
 
+/* ── Recent Successes Card Grid ──────────────── */
+.success-section {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-light);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+}
+
+.success-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-4);
+}
+
+.success-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: default;
+}
+
+.success-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--bg-accent);
+}
+
+.success-card__icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.success-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.success-card__title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.success-card__meta {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.success-card__tags {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.success-card__program {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--bg-accent-light);
+    color: var(--bg-accent);
+    white-space: nowrap;
+}
+
+.success-card__date {
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
 @media (max-width: 768px) {
 
     .data-table--simple th:nth-child(2),
@@ -1037,6 +1122,19 @@
     }
 
     /* Dashboard/Stats Board responsiveness handled in primary layout section */
+
+    /* Recent Success Cards - mobile */
+    .success-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .success-card__title {
+        white-space: normal;
+    }
+
+    .success-section {
+        padding: var(--space-4);
+    }
 
 }
 
@@ -1311,8 +1409,15 @@
 }
 
 @keyframes panelFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .admin-panel {

@@ -233,37 +233,35 @@ const ui = {
     renderRecentSuccesses(successes) {
         if (!successes || successes.length === 0) return '';
 
-        // Limit to 5 most recent
-        const items = successes.slice(0, 5);
+        const items = successes.slice(0, 6);
 
-        const rows = items.map(s => {
+        const cards = items.map(s => {
             const noc = (typeof lookupNOC === 'function') ? lookupNOC(s.noc_code) : null;
             const jobTitle = noc ? noc.title : s.noc_code;
             const teer = noc ? noc.teer : null;
+            const daysAgo = this.getDaysAgo(s.nominated_date);
+
             return `
-            <tr>
-                <td><div class="success-item__icon">🏆</div></td>
-                <td>
-                    <div class="job-title-cell" style="font-weight:600; font-size:13px">${jobTitle}</div>
-                    <div style="font-size:11px; color:var(--text-muted)">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
-                </td>
-                <td><span class="app-tag">${s.program_type}</span></td>
-                <td><span class="text-secondary" style="font-size: 11px">Nominated: ${this.formatDate(s.nominated_date)}</span></td>
-                <td class="text-secondary">${this.getDaysAgo(s.nominated_date)}</td>
-            </tr>
-        `}).join('');
+            <div class="success-card">
+                <div class="success-card__icon">🏆</div>
+                <div class="success-card__body">
+                    <div class="success-card__title">${jobTitle}</div>
+                    <div class="success-card__meta">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
+                    <div class="success-card__tags">
+                        <span class="success-card__program">${s.program_type}</span>
+                        <span class="success-card__date">${daysAgo}</span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
 
         return `
-            <div class="table-card table-card--successes">
+            <div class="success-section">
                 <div class="section-header" style="margin-bottom: var(--space-4)">
                     <h3 class="section-title" style="font-size: var(--fs-md)">Recent Successes</h3>
                 </div>
-                <div class="table-wrapper">
-                    <table class="data-table data-table--compact">
-                        <tbody>
-                            ${rows}
-                        </tbody>
-                    </table>
+                <div class="success-cards-grid">
+                    ${cards}
                 </div>
             </div>
         `;
