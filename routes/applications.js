@@ -33,9 +33,10 @@ router.post('/', authenticateToken, async (req, res) => {
         }
 
         let nominatedDate = null;
-        if (status === 'Nominated' || status === 'Endorsed') {
+        if (status === 'Nominated' || status === 'Endorsed' || status === 'Selected for EOI') {
             nominatedDate = nominated_date || new Date().toISOString().split('T')[0];
         }
+        console.log(`[APP] Body status: ${status}, body nominated_date: ${nominated_date}, resolved: ${nominatedDate}`);
 
         const waiting = calculateWaitingTime(submission_date, status || 'Submitted', nominatedDate);
         const countdown = calculateWorkPermitCountdown(work_permit_expiry);
@@ -83,10 +84,11 @@ router.put('/:id', authenticateToken, async (req, res) => {
         const { program_type, stream, noc_code, submission_date, work_permit_expiry, status, status_note, ns_graduate, has_case_number, case_number_date, nominated_date } = req.body;
 
         let nominatedDate = app.nominated_date;
-        if ((status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
+        const isMilestone = (s) => s === 'Nominated' || s === 'Endorsed' || s === 'Selected for EOI';
+
+        if (isMilestone(status) && !isMilestone(app.status)) {
             nominatedDate = nominated_date || new Date().toISOString().split('T')[0];
-        } else if (status === 'Nominated' || status === 'Endorsed') {
-            // Allow updating the nominated_date if user provides one
+        } else if (isMilestone(status)) {
             nominatedDate = nominated_date || app.nominated_date;
         }
 

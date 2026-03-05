@@ -375,8 +375,15 @@ function updateAdminStreamOptions() {
 function toggleAdminNominatedDateField() {
     const status = document.getElementById('adminStatus').value;
     const container = document.getElementById('adminNominatedDateContainer');
-    if (status === 'Nominated' || status === 'Endorsed') {
+    const label = document.getElementById('adminNominatedDateLabel');
+
+    if (status === 'Nominated' || status === 'Endorsed' || status === 'Selected for EOI') {
         container.classList.remove('hidden');
+        if (status === 'Selected for EOI') {
+            label.innerText = 'Selection Date';
+        } else {
+            label.innerText = 'When were they nominated?';
+        }
     } else {
         container.classList.add('hidden');
         document.getElementById('adminNominatedDate').value = '';
@@ -408,7 +415,9 @@ document.getElementById('adminEditForm')?.addEventListener('submit', async (e) =
         status: document.getElementById('adminStatus').value,
         status_note: document.getElementById('adminStatusNote').value,
         ns_graduate: document.getElementById('adminNsGrad').checked,
-        nominated_date: (document.getElementById('adminStatus').value === 'Nominated' || document.getElementById('adminStatus').value === 'Endorsed')
+        nominated_date: (document.getElementById('adminStatus').value === 'Nominated' ||
+            document.getElementById('adminStatus').value === 'Endorsed' ||
+            document.getElementById('adminStatus').value === 'Selected for EOI')
             ? document.getElementById('adminNominatedDate').value : null,
         has_case_number: hasCase,
         case_number_date: hasCase ? document.getElementById('adminCaseDate').value : null

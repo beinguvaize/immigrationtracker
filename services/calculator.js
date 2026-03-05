@@ -4,8 +4,10 @@
 
 function calculateWaitingTime(submissionDateStr, status, nominatedDateStr) {
     const submission = new Date(submissionDateStr);
-    // If nominated/endorsed/refused, stop counter at that date (or now if no nominated_date)
-    const endDate = (status === 'Nominated' || status === 'Endorsed' || status === 'Refused')
+    const isMilestone = (s) => s === 'Nominated' || s === 'Endorsed' || s === 'Selected for EOI' || s === 'Refused';
+
+    // If nominated/endorsed/refused/selected, stop counter at that date (or now if no nominated_date)
+    const endDate = isMilestone(status)
         ? (nominatedDateStr ? new Date(nominatedDateStr) : new Date())
         : new Date();
 

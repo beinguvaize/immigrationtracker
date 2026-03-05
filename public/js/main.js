@@ -430,8 +430,15 @@ document.getElementById('hasCaseNumber').addEventListener('change', (e) => {
 function toggleNominatedDateField() {
     const status = document.getElementById('appStatus').value;
     const container = document.getElementById('nominatedDateContainer');
-    if (status === 'Nominated') {
+    const label = document.getElementById('nominatedDateLabel');
+
+    if (status === 'Nominated' || status === 'Endorsed' || status === 'Selected for EOI') {
         container.classList.remove('hidden');
+        if (status === 'Selected for EOI') {
+            label.innerText = 'Selection Date';
+        } else {
+            label.innerText = 'When were you nominated?';
+        }
     } else {
         container.classList.add('hidden');
         document.getElementById('nominatedDate').value = '';

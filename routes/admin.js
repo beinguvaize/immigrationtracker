@@ -239,7 +239,9 @@ router.put('/applications/:id', async (req, res) => {
         } = req.body;
 
         let nominatedDate = req.body.nominated_date || app.nominated_date;
-        if (!req.body.nominated_date && (status === 'Nominated' || status === 'Endorsed') && app.status !== 'Nominated' && app.status !== 'Endorsed') {
+        const isMilestone = (s) => s === 'Nominated' || s === 'Endorsed' || s === 'Selected for EOI';
+
+        if (!req.body.nominated_date && isMilestone(status) && !isMilestone(app.status)) {
             nominatedDate = new Date().toISOString().split('T')[0];
         }
 
