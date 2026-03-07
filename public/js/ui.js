@@ -61,7 +61,7 @@ const ui = {
                             <div class="status-pill__dot"></div>
                             ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
                         </div>
-                        <div class="status-date">Updated: ${this.formatDate(app.updated_at)}</div>
+                        <div class="status-date">${this.getStatusDateLabel(app.status, app.updated_at)}</div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(app.waiting_months)}</td>
@@ -312,7 +312,7 @@ const ui = {
                 <td>
                     <div class="status-column">
                         <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</div>
-                        <div class="status-date">${this.formatDate(row.updated_at)}</div>
+                        <div class="status-date">${this.getStatusDateLabel(row.status, row.updated_at)}</div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
@@ -354,6 +354,18 @@ const ui = {
                 </div>
             </div>
         `;
+    },
+
+    getStatusDateLabel(status, date) {
+        if (!date) return '';
+        const verb = {
+            'Submitted': 'Submitted on',
+            'Selected for EOI': 'Selected on',
+            'Nominated': 'Nominated on',
+            'Endorsed': 'Endorsed on',
+            'Refused': 'Refused on'
+        }[status] || 'Updated on';
+        return `${verb} ${this.formatDate(date)}`;
     },
 
     formatWaitTime(months) {
