@@ -23,10 +23,10 @@ const APP_DATA = {
     statuses: ['Submitted', 'Selected for EOI', 'Nominated', 'Refused'],
 
     riskLabels: {
-        green: { label: 'Safe', icon: '✓', desc: '> 120 days remaining' },
-        yellow: { label: 'Caution', icon: '⚠', desc: '60–120 days remaining' },
-        red: { label: 'Critical', icon: '⚠', desc: '< 60 days remaining' },
-        expired: { label: 'Expired', icon: '✕', desc: 'Work permit expired' }
+        green: { label: 'Safe', icon: '<i class="fa-solid fa-circle-check"></i>', desc: '> 120 days remaining' },
+        yellow: { label: 'Caution', icon: '<i class="fa-solid fa-triangle-exclamation"></i>', desc: '60–120 days remaining' },
+        red: { label: 'Critical', icon: '<i class="fa-solid fa-circle-exclamation"></i>', desc: '< 60 days remaining' },
+        expired: { label: 'Expired', icon: '<i class="fa-solid fa-circle-xmark"></i>', desc: 'Work permit expired' }
     },
 
     statusColors: {

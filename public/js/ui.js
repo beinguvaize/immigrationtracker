@@ -6,13 +6,13 @@ const ui = {
         toast.className = `toast toast--${type}`;
 
         const icons = {
-            success: '✅',
-            error: '❌',
-            info: 'ℹ️'
+            success: '<i class="fa-solid fa-circle-check"></i>',
+            error: '<i class="fa-solid fa-circle-xmark"></i>',
+            info: '<i class="fa-solid fa-circle-info"></i>'
         };
 
         toast.innerHTML = `
-            <span>${icons[type] || ''}</span>
+            ${icons[type] || ''}
             <span>${message}</span>
         `;
 
@@ -25,10 +25,13 @@ const ui = {
         if (!apps || apps.length === 0) {
             return `
                 <div class="empty-state">
-                    <div class="empty-state__icon">📋</div>
+                    <div class="empty-state__icon"><i class="fa-solid fa-folder-open"></i></div>
                     <h3 class="empty-state__title">No Applications Yet</h3>
                     <p class="empty-state__desc">Add your PNP or AIP application to start tracking your waiting time and work permit expiry.</p>
-                    <button class="btn btn--primary" onclick="app.openModal()">Add My First Application</button>
+                    <button class="btn btn--modern" onclick="app.openModal()">
+                        <i class="fa-solid fa-plus"></i>
+                        Add My First Application
+                    </button>
                 </div>
             `;
         }
@@ -53,9 +56,12 @@ const ui = {
                 </td>
                 <td>${this.formatDate(app.submission_date)}</td>
                 <td>
-                    <div class="status-pill status-pill--${app.status.toLowerCase().replace(/ /g, '-')}">
-                        <div class="status-pill__dot"></div>
-                        ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
+                    <div class="status-column">
+                        <div class="status-pill status-pill--${app.status.toLowerCase().replace(/ /g, '-')}">
+                            <div class="status-pill__dot"></div>
+                            ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
+                        </div>
+                        <div class="status-date">${this.getStatusDateLabel(app.status, app.updated_at)}</div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(app.waiting_months)}</td>
@@ -138,7 +144,7 @@ const ui = {
                 <div class="permit-countdown">
                     <div class="permit-countdown__info">
                         <div class="permit-countdown__label">Work Permit</div>
-                        <div class="permit-countdown__value">${app.days_remaining} days</div>
+                        <div class="permit-countdown__value">${this.formatWaitTime(app.days_remaining / 30.44)}</div>
                     </div>
                     <div class="risk-indicator risk-indicator--${app.risk_level}">
                         <span class="risk-indicator__icon">${this.getRiskIcon(app.risk_level)}</span>
@@ -148,13 +154,13 @@ const ui = {
 
                 ${app.ns_graduate ? `
                 <div class="app-card__badge app-card__badge--grad">
-                    🎓 NS Graduate
+                    <i class="fa-solid fa-user-graduate"></i> NS Graduate
                 </div>
                 ` : ''}
 
                 ${app.nominated_date ? `
                 <div class="app-card__badge app-card__badge--nominated">
-                    🏆 Nominated on: ${this.formatDate(app.nominated_date)}
+                    <i class="fa-solid fa-award"></i> Nominated on: ${this.formatDate(app.nominated_date)}
                 </div>
                 ` : ''}
 
@@ -173,8 +179,13 @@ const ui = {
     },
 
     getRiskIcon(level) {
-        const icons = { green: '✅', yellow: '⚠️', red: '🚨', expired: '❌' };
-        return icons[level] || '❓';
+        const icons = {
+            green: '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i>',
+            yellow: '<i class="fa-solid fa-triangle-exclamation" style="color:var(--ns-gold)"></i>',
+            red: '<i class="fa-solid fa-circle-exclamation" style="color:var(--danger)"></i>',
+            expired: '<i class="fa-solid fa-circle-xmark" style="color:var(--text-muted)"></i>'
+        };
+        return icons[level] || '<i class="fa-solid fa-question"></i>';
     },
 
     getRiskLabel(level) {
@@ -182,7 +193,7 @@ const ui = {
         return labels[level] || 'Unknown';
     },
 
-    // ===== STAT CARDS (IRCC Tracker Style) =====
+    // ===== STAT CARDS (Nova Scotia Immigration Tracker Style) =====
     renderStatCards(stats, programBreakdown) {
         // Build per-program stacked rows (each program on its own line)
         const getBreakdownLines = (field) => {
@@ -199,29 +210,44 @@ const ui = {
         };
 
         return `
-            <div class="stat-card stat-card--featured">
-                <div class="stat-card__label">Total Applicants</div>
-                <div class="stat-card__value" style="font-size: var(--fs-3xl); margin: var(--space-2) 0;">
+            <div class="stat-card stat-card--premium">
+                <div class="stat-card__premium-header">
+                    <div class="stat-card__premium-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="stat-card__premium-label">Total Applicants</div>
+                </div>
+                <div class="stat-card__premium-value">
                     ${stats.total_applicants}
                 </div>
-                <div class="stat-card__trend trend--up" style="font-size:11px; color:var(--text-muted);">
-                    Increased from last month
+                <div class="stat-card__premium-trend">
+                    <span class="trend-val"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                    <span class="trend-label">from last month</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Avg. Waiting Time</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-clock"></i>
+                    <div class="stat-card__label">Avg. Waiting Time</div>
+                </div>
                 <div style="margin-top:var(--space-1); width:100%;">
                     ${getBreakdownLines('avg_waiting')}
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Nomination Success</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-medal"></i>
+                    <div class="stat-card__label">Nomination Success</div>
+                </div>
                 <div style="margin-top:var(--space-2);">
                     ${getBreakdownLines('pct_nominated')}
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Longest Wait</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <div class="stat-card__label">Longest Wait</div>
+                </div>
                 <div style="margin-top:var(--space-2);">
                     ${getBreakdownLines('max_waiting')}
                 </div>
@@ -243,7 +269,7 @@ const ui = {
 
             return `
             <div class="success-card">
-                <div class="success-card__icon">🏆</div>
+                <div class="success-card__icon"><i class="fa-solid fa-award"></i></div>
                 <div class="success-card__body">
                     <div class="success-card__title">${jobTitle}</div>
                     <div class="success-card__meta">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
@@ -299,18 +325,22 @@ const ui = {
                 </td>
                 <td>${this.formatDate(row.submission_date)}</td>
                 <td>
-                    <span class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</span>
+                    <div class="status-column">
+                        <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</div>
+                        <div class="status-date">${this.getStatusDateLabel(row.status, row.updated_at)}</div>
+                    </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
-                <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? row.days_remaining + 'd' : '—'}</td>
+                <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? this.formatWaitTime(row.days_remaining / 30.44) : '—'}</td>
                 <td>
-                    <span class="cell-risk cell-risk--${row.risk_level}">
+                    <div class="risk-indicator risk-indicator--${row.risk_level}" style="display:flex; align-items:center; gap:var(--space-2);">
+                        <span class="risk-indicator__icon">${this.getRiskIcon(row.risk_level)}</span>
                         ${this.getRiskLabel(row.risk_level)}
-                    </span>
+                    </div>
                 </td>
-                <td style="text-align: center;">${row.ns_graduate ? '🎓' : '—'}</td>
+                <td style="text-align: center;">${row.ns_graduate ? '<i class="fa-solid fa-user-graduate" style="color:var(--ns-blue)"></i>' : '—'}</td>
                 <td style="text-align: center; font-size:12px;">
-                    ${row.has_case_number ? `<span style="color:var(--clr-green); font-weight:600;">✓</span>${row.case_number_date ? `<div style="font-size:10px;color:var(--text-muted)">${this.formatDate(row.case_number_date)}</div>` : ''}` : '—'}
+                    ${row.has_case_number ? `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-check"></i></span>${row.case_number_date ? `<div style="font-size:10px;color:var(--text-muted)">${this.formatDate(row.case_number_date)}</div>` : ''}` : '—'}
                 </td>
             </tr>
         `}).join('');
@@ -340,6 +370,11 @@ const ui = {
                 </div>
             </div>
         `;
+    },
+
+    getStatusDateLabel(status, date) {
+        if (!date) return '';
+        return `on ${this.formatDate(date)}`;
     },
 
     formatWaitTime(months) {
@@ -375,7 +410,6 @@ const ui = {
     renderAdminStats(stats) {
         const items = [
             { label: 'Active Users', value: stats.totalUsers || 0, trend: 'Total in system' },
-            { label: 'Active Today', value: Math.round((stats.totalUsers || 0) * 0.42), trend: 'Simulated activity' },
             { label: 'Applications', value: stats.totalApplications || 0, trend: '+12.5% this month' },
             { label: 'Avg. Wait', value: this.formatWaitTime(stats.avgWaitingMonths), trend: 'Global benchmark' },
             { label: 'Successes', value: stats.nominatedApplications || 0, trend: 'Confirmed wins' },

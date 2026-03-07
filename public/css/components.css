@@ -55,6 +55,12 @@
     color: var(--text-on-accent);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.badge-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .badge-card__title {
@@ -424,6 +430,7 @@
 
 .stat-card {
     background: var(--bg-card);
+    color: var(--text-primary);
     padding: var(--space-6);
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-subtle);
@@ -431,6 +438,15 @@
     flex-direction: column;
     gap: var(--space-2);
     transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card .job-title-cell {
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* ── Dashboard Grid & Charts ───────────────────────── */
@@ -505,6 +521,12 @@
     border: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 640px) {
@@ -607,19 +629,30 @@
     border-radius: var(--radius-lg);
     font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.05);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 /* Modern Animated Button - The "Beautiful" Request */
 .btn--modern {
     border-radius: var(--radius-full);
     padding: var(--space-3) var(--space-8);
-    background: linear-gradient(135deg, var(--bg-accent), var(--accent-green-hover));
+    background: linear-gradient(135deg, var(--ns-blue), #0a6ab3);
     color: var(--text-on-accent);
-    box-shadow: 0 4px 15px var(--accent-green-alpha);
+    box-shadow: 0 4px 15px rgba(5, 88, 149, 0.2);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 1;
 }
@@ -640,9 +673,9 @@
 }
 
 .btn--modern:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 25px var(--accent-green-alpha);
-    filter: brightness(1.1);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(5, 88, 149, 0.3);
+    border: 1px solid rgba(197, 160, 89, 0.3);
 }
 
 .btn--modern:hover::before {
@@ -650,8 +683,7 @@
 }
 
 .btn--modern:active {
-    transform: translateY(0) scale(0.96);
-    box-shadow: 0 4px 10px var(--accent-green-alpha);
+    transform: translateY(-1px) scale(0.98);
 }
 
 .btn--primary {
@@ -781,6 +813,31 @@
     padding: var(--space-10);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
+.auth-card__header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.auth-card__logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.auth-card__logo img {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    max-width: 100%;
 }
 
 @media (max-width: 480px) {
@@ -879,6 +936,14 @@
     padding: var(--space-6);
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--space-6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.table-card:hover,
+.widget-card:hover,
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .widget-card__title {
@@ -927,14 +992,14 @@
     color: var(--pending);
 }
 
-.status-pill--nominated {
-    background: var(--nominated-bg);
-    color: var(--nominated);
+.status-pill.status-pill--nominated {
+    background: #ecfdf5 !important;
+    color: #10b981 !important;
 }
 
-.status-pill--endorsed {
-    background: var(--nominated-bg);
-    color: var(--nominated);
+.status-pill.status-pill--endorsed {
+    background: #ecfdf5 !important;
+    color: #10b981 !important;
 }
 
 .status-pill--refused {
@@ -1141,21 +1206,39 @@
 
 /* ── Stat Card Refinements ────────────────────────── */
 .stat-card--featured {
-    background: var(--bg-accent-light);
-    border-color: var(--bg-accent);
+    background: var(--ns-blue);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(5, 88, 149, 0.2);
+}
+
+.auth-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-bold);
+    color: #055895;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+}
+
+.stat-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    color: #475569;
+}
+
+.stat-card__header i {
+    font-size: 14px;
 }
 
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: var(--text-secondary);
+    color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.stat-card--featured .stat-card__label {
-    color: var(--text-accent);
-    opacity: 0.8;
+    letter-spacing: 0.05em;
 }
 
 .stat-card__value {
@@ -1164,18 +1247,125 @@
     color: var(--text-primary);
 }
 
-.stat-card--featured .stat-card__value {
-    color: var(--text-accent);
-}
-
 .stat-card__trend {
     font-size: 11px;
     color: var(--text-muted);
 }
 
+.stat-card .job-title-cell {
+    color: var(--text-muted);
+}
+
+/* ── Premium Stat Card (Featured) ────────────────── */
+.stat-card--premium {
+    background: linear-gradient(135deg, #329dfa 0%, #055895 100%);
+    border: none;
+    box-shadow: 0 15px 35px -5px rgba(5, 88, 149, 0.4);
+    padding: var(--space-5) var(--space-6);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+
+.stat-card--premium::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 180px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.stat-card__premium-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    z-index: 1;
+    position: relative;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.stat-card__premium-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-card__premium-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    opacity: 0.95;
+    color: white !important;
+}
+
+.stat-card__premium-value {
+    font-size: 52px;
+    font-weight: 800;
+    margin-bottom: var(--space-4);
+    line-height: 1;
+    z-index: 1;
+    position: relative;
+    text-align: center;
+    letter-spacing: -0.01em;
+    color: white !important;
+}
+
+.stat-card__premium-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-size: 14px;
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 1;
+    position: relative;
+    width: 90%;
+}
+
+.stat-card__premium-trend .trend-val {
+    color: #4ade80 !important;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-card__premium-trend .trend-label {
+    opacity: 0.85;
+    color: white !important;
+}
+
+.stat-card--featured .stat-card__label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.stat-card--featured .stat-card__value {
+    color: white !important;
+}
+
 .stat-card--featured .stat-card__trend {
-    color: var(--text-accent);
-    opacity: 0.7;
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* ── Status Pill: Selected for EOI ────────────────── */
