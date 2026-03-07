@@ -197,7 +197,7 @@ function renderApplications() {
     if (state.apps.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state__icon">📋</div>
+                <div class="empty-state__icon"><i class="fa-solid fa-folder-open"></i></div>
                 <h3 class="empty-state__title">No Applications Yet</h3>
                 <p class="empty-state__desc">Add your PNP or AIP application to start tracking your waiting time and work permit expiry.</p>
                 <button class="btn btn--primary" onclick="app.openModal()">Add My First Application</button>
@@ -489,7 +489,7 @@ document.getElementById('programType').addEventListener('change', updateStreamOp
 function updateStreamOptionsInForm() {
     const program = document.getElementById('programType').value;
     const streamSelect = document.getElementById('stream');
-    let options = '<option value="">Select stream…</option>';
+    let options = '<option value="">Select stream...</option>';
     if (program && STREAMS[program]) {
         options += STREAMS[program].map(s => `<option value="${s}">${s}</option>`).join('');
     }

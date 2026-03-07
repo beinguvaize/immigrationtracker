@@ -103,7 +103,8 @@
                             <div class="profile-name">Administrator</div>
                             <div class="profile-email" id="adminEmailSpan">System Admin</div>
                         </div>
-                        <div class="profile-avatar" style="background: var(--bg-accent)">🔑</div>
+                        <div class="profile-avatar" style="background: var(--ns-blue)"><i class="fa-solid fa-key"></i>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -272,7 +273,8 @@
                             style="background: var(--bg-accent-light); color: #000000; padding: var(--space-10) var(--space-8); text-align: center; position: relative;">
                             <div
                                 style="font-size: 3rem; margin-bottom: var(--space-4); background: rgba(0,0,0,0.05); width: 80px; height: 80px; line-height: 80px; border-radius: 50%; margin: 0 auto var(--space-4) auto;">
-                                🍁</div>
+                                <img src="/assets/logo.png" alt="NS Logo" style="height: 24px; opacity: 0.8;">
+                            </div>
                             <h1
                                 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 2rem; margin-bottom: var(--space-2); color: #000000;">
                                 Welcome Applicants</h1>
@@ -283,7 +285,7 @@
                         <div class="help-card__body"
                             style="padding: var(--space-10) var(--space-12); color: var(--text-primary); line-height: 1.8; font-size: var(--fs-base); background: var(--bg-secondary);">
                             <p
-                                style="margin-bottom: var(--space-6); font-weight: 600; font-size: 1.1rem; color: var(--accent-green);">
+                                style="margin-bottom: var(--space-6); font-weight: 600; font-size: 1.1rem; color: var(--ns-blue);">
                                 Dear PNP and AIP applicants,</p>
 
                             <p style="margin-bottom: var(--space-6);">My name is <strong>Uvaize</strong>, and I
@@ -306,25 +308,25 @@
                             <div
                                 style="background: var(--bg-tertiary); padding: var(--space-6) var(--space-8); border-radius: var(--radius-lg); margin-bottom: var(--space-8); border-left: 4px solid var(--accent-green);">
                                 <h3
-                                    style="font-family: 'Outfit'; color: var(--accent-green); margin-bottom: var(--space-4); font-size: 1.2rem;">
+                                    style="font-family: 'Outfit'; color: var(--ns-blue); margin-bottom: var(--space-4); font-size: 1.2rem;">
                                     The tracker is designed to:</h3>
                                 <ul style="list-style: none; padding: 0;">
                                     <li
                                         style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                                        <span style="color: var(--accent-green);">✓</span> Monitor application
-                                        stages
+                                        <span style="color: var(--ns-blue);"><i
+                                                class="fa-solid fa-circle-check"></i></span> Monitor application stages
                                         collectively
                                     </li>
                                     <li
                                         style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                                        <span style="color: var(--accent-green);">✓</span> Identify processing
-                                        trends
+                                        <span style="color: var(--ns-blue);"><i
+                                                class="fa-solid fa-circle-check"></i></span> Identify processing trends
                                     </li>
                                     <li
                                         style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                                        <span style="color: var(--accent-green);">✓</span> Help with better
-                                        financial and
-                                        personal planning
+                                        <span style="color: var(--ns-blue);"><i
+                                                class="fa-solid fa-circle-check"></i></span> Help with better financial
+                                        and career planning
                                     </li>
                                 </ul>
                             </div>
@@ -356,7 +358,8 @@
         <div class="modal">
             <div class="modal__header">
                 <h2 class="modal__title">Admin Edit Application</h2>
-                <button class="modal__close" id="adminEditCloseBtn" type="button">✕</button>
+                <button class="modal__close" id="adminEditCloseBtn" type="button"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <form class="modal__form" id="adminEditForm">
                 <input type="hidden" id="adminEditAppId" value="">
@@ -444,7 +447,8 @@
             <div class="modal__header">
                 <h2 class="modal__title">Application Details</h2>
                 <button class="modal__close"
-                    onclick="document.getElementById('adminDetailsModal').classList.add('hidden')">✕</button>
+                    onclick="document.getElementById('adminDetailsModal').classList.add('hidden')"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal__content" id="adminDetailsContent" style="padding: var(--space-6);">
                 <!-- Rendered by JS -->

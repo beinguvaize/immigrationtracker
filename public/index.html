@@ -88,7 +88,9 @@
     <aside class="sidebar">
       <div>
         <div class="brand">
-          <div class="brand__logo">🍁</div>
+          <div class="brand__logo">
+            <img src="/assets/logo.png" alt="Logo" style="height: 32px;">
+          </div>
           <div class="brand__name">Immigration Tracker</div>
         </div>
 
@@ -305,13 +307,19 @@
                     <table class="data-table" id="applicantTable">
                       <thead>
                         <tr>
-                          <th data-sort="program_type">Program <span class="sort-icon">↕</span></th>
+                          <th data-sort="program_type">Program <span class="sort-icon"><i
+                                class="fa-solid fa-sort"></i></span></th>
                           <th>Stream</th>
-                          <th data-sort="noc_code">NOC <span class="sort-icon">↕</span></th>
-                          <th data-sort="submission_date">Submitted <span class="sort-icon">↕</span></th>
-                          <th data-sort="status">Status <span class="sort-icon">↕</span></th>
-                          <th data-sort="waiting_months">Waiting <span class="sort-icon">↕</span></th>
-                          <th data-sort="days_remaining">WP Days <span class="sort-icon">↕</span></th>
+                          <th data-sort="noc_code">NOC <span class="sort-icon"><i class="fa-solid fa-sort"></i></span>
+                          </th>
+                          <th data-sort="submission_date">Submitted <span class="sort-icon"><i
+                                class="fa-solid fa-sort"></i></span></th>
+                          <th data-sort="status">Status <span class="sort-icon"><i class="fa-solid fa-sort"></i></span>
+                          </th>
+                          <th data-sort="waiting_months">Waiting <span class="sort-icon"><i
+                                class="fa-solid fa-sort"></i></span></th>
+                          <th data-sort="days_remaining">WP Days <span class="sort-icon"><i
+                                class="fa-solid fa-sort"></i></span></th>
                           <th>Risk</th>
                           <th>NS Grad</th>
                           <th>Case Num</th>
@@ -340,7 +348,8 @@
               style="background: var(--bg-accent-light); color: #000000; padding: var(--space-10) var(--space-8); text-align: center; position: relative;">
               <div
                 style="font-size: 3rem; margin-bottom: var(--space-4); background: rgba(0,0,0,0.05); width: 80px; height: 80px; line-height: 80px; border-radius: 50%; margin: 0 auto var(--space-4) auto;">
-                🍁</div>
+                <img src="/assets/logo.png" alt="NS Logo" style="height: 24px; opacity: 0.8;">
+              </div>
               <h1
                 style="font-family: 'Outfit'; font-weight: 700; font-size: 2rem; margin-bottom: var(--space-2); color: #000000;">
                 Welcome
@@ -376,19 +385,24 @@
                   The tracker is designed to:</h3>
                 <ul style="list-style: none; padding: 0;">
                   <li style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                    <span style="color: var(--bg-accent);">✓</span> Monitor application stages collectively
+                    <span style="color: var(--ns-blue);"><i class="fa-solid fa-circle-check"></i></span> Monitor
+                    application stages collectively
                   </li>
                   <li style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                    <span style="color: var(--bg-accent);">✓</span> Identify processing trends
+                    <span style="color: var(--ns-blue);"><i class="fa-solid fa-circle-check"></i></span> Identify
+                    processing trends
                   </li>
                   <li style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                    <span style="color: var(--bg-accent);">✓</span> Help with better financial and career planning
+                    <span style="color: var(--ns-blue);"><i class="fa-solid fa-circle-check"></i></span> Help with
+                    better financial and career planning
                   </li>
                   <li style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                    <span style="color: var(--bg-accent);">✓</span> Reduce uncertainty through shared information
+                    <span style="color: var(--ns-blue);"><i class="fa-solid fa-circle-check"></i></span> Reduce
+                    uncertainty through shared information
                   </li>
                   <li style="margin-bottom: var(--space-2); display: flex; align-items: start; gap: 10px;">
-                    <span style="color: var(--bg-accent);">✓</span> Build a supportive applicant community
+                    <span style="color: var(--ns-blue);"><i class="fa-solid fa-circle-check"></i></span> Build a
+                    supportive applicant community
                   </li>
                 </ul>
               </div>
@@ -413,7 +427,8 @@
       <!-- Footer -->
       <footer class="footer">
         <p class="footer__text">
-          🍁 Your Journey to Canada, Simplified<br>
+          <img src="/assets/logo.png" alt="NS Logo" style="height: 20px; vertical-align: middle; margin-right: 8px;">
+          Your Journey to Canada, Simplified<br>
           A community-driven portal for NS PNP & AIP applicants.
         </p>
       </footer>
@@ -424,7 +439,7 @@
       <div class="modal">
         <div class="modal__header">
           <h2 class="modal__title" id="modalTitle">Add Application</h2>
-          <button class="modal__close" id="modalCloseBtn" type="button">✕</button>
+          <button class="modal__close" id="modalCloseBtn" type="button"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <form class="modal__form" id="appForm">

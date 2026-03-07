@@ -293,8 +293,8 @@ window.admin = {
                 <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Submission Date</div><strong>${ui.formatDate(appData.submission_date)}</strong></div>
                 <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">WP Expiry</div><strong>${ui.formatDate(appData.work_permit_expiry)}</strong><br><span style="font-size:11px; color:var(--accent-info)">${ui.formatWaitTime(appData.days_remaining / 30.44)} left</span></div>
                 <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Current Status</div><span class="status-pill status-pill--${appData.status.toLowerCase()}">${appData.status}</span></div>
-                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">NS Graduate</div><strong>${appData.ns_graduate ? '🎓 Yes' : 'No'}</strong></div>
-                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Case Number</div><strong>${appData.has_case_number ? '✅ ' + ui.formatDate(appData.case_number_date) : '❌ No'}</strong></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">NS Graduate</div><strong>${appData.ns_graduate ? '<i class="fa-solid fa-user-graduate"></i> Yes' : 'No'}</strong></div>
+                <div><div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Case Number</div><strong>${appData.has_case_number ? '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i> ' + ui.formatDate(appData.case_number_date) : '<i class="fa-solid fa-circle-xmark" style="color:var(--text-muted)"></i> No'}</strong></div>
             </div>
             ${appData.status_note ? `<div style="padding: 1rem; border-left: 4px solid var(--bg-accent); background: var(--bg-accent-light); border-radius: 4px;">
                 <div style="font-size: 11px; color: var(--text-accent); text-transform: uppercase; margin-bottom: 4px;">Public Status Note</div>
