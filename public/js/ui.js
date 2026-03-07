@@ -202,9 +202,9 @@ const ui = {
                 let val = p[field];
                 if (field === 'pct_nominated') val = (val || 0) + '%';
                 else if (field === 'avg_waiting' || field === 'max_waiting') val = this.formatWaitTime(val);
-                return `<div style="display:flex; flex-direction:column; align-items:center; padding:4px 0; border-top:1px solid rgba(255,255,255,0.1); width:100%;">
-                    <div style="font-size:10px; color:rgba(255,255,255,0.7); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${p.program_type}</div>
-                    <div style="font-size:var(--fs-md); font-weight:800; color:white;">${val}</div>
+                return `<div style="display:flex; flex-direction:column; align-items:center; padding:4px 0; border-top:1px solid rgba(0,0,0,0.05); width:100%;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${p.program_type}</div>
+                    <div style="font-size:var(--fs-md); font-weight:800; color:var(--text-primary);">${val}</div>
                 </div>`;
             }).join('');
         };
