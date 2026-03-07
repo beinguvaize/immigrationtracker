@@ -992,14 +992,14 @@
     color: var(--pending);
 }
 
-.status-pill--nominated {
-    background: var(--nominated-bg);
-    color: var(--nominated);
+.status-pill.status-pill--nominated {
+    background: #ecfdf5 !important;
+    color: #10b981 !important;
 }
 
-.status-pill--endorsed {
-    background: var(--nominated-bg);
-    color: var(--nominated);
+.status-pill.status-pill--endorsed {
+    background: #ecfdf5 !important;
+    color: #10b981 !important;
 }
 
 .status-pill--refused {
