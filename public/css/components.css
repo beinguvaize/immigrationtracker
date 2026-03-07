@@ -1197,17 +1197,20 @@
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: rgba(255, 255, 255, 0.85);
+    color: #000000;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .stat-card__value {
-    color: white !important;
+    font-size: var(--fs-2xl);
+    font-weight: 900;
+    color: var(--text-primary);
 }
 
 .stat-card__trend {
-    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
 .stat-card .job-title-cell {
@@ -1218,19 +1221,8 @@
     color: rgba(255, 255, 255, 0.85);
 }
 
-.stat-card__value {
-    font-size: var(--fs-2xl);
-    font-weight: 900;
-    color: var(--text-primary);
-}
-
 .stat-card--featured .stat-card__value {
     color: white !important;
-}
-
-.stat-card__trend {
-    font-size: 11px;
-    color: var(--text-muted);
 }
 
 .stat-card--featured .stat-card__trend {
