@@ -138,7 +138,7 @@ const ui = {
                 <div class="permit-countdown">
                     <div class="permit-countdown__info">
                         <div class="permit-countdown__label">Work Permit</div>
-                        <div class="permit-countdown__value">${app.days_remaining} days</div>
+                        <div class="permit-countdown__value">${this.formatWaitTime(app.days_remaining / 30.44)}</div>
                     </div>
                     <div class="risk-indicator risk-indicator--${app.risk_level}">
                         <span class="risk-indicator__icon">${this.getRiskIcon(app.risk_level)}</span>
@@ -182,7 +182,7 @@ const ui = {
         return labels[level] || 'Unknown';
     },
 
-    // ===== STAT CARDS (IRCC Tracker Style) =====
+    // ===== STAT CARDS (Nova Scotia Immigration Tracker Style) =====
     renderStatCards(stats, programBreakdown) {
         // Build per-program stacked rows (each program on its own line)
         const getBreakdownLines = (field) => {
@@ -302,7 +302,7 @@ const ui = {
                     <span class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</span>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
-                <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? row.days_remaining + 'd' : '—'}</td>
+                <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? this.formatWaitTime(row.days_remaining / 30.44) : '—'}</td>
                 <td>
                     <span class="cell-risk cell-risk--${row.risk_level}">
                         ${this.getRiskLabel(row.risk_level)}
@@ -375,7 +375,6 @@ const ui = {
     renderAdminStats(stats) {
         const items = [
             { label: 'Active Users', value: stats.totalUsers || 0, trend: 'Total in system' },
-            { label: 'Active Today', value: Math.round((stats.totalUsers || 0) * 0.42), trend: 'Simulated activity' },
             { label: 'Applications', value: stats.totalApplications || 0, trend: '+12.5% this month' },
             { label: 'Avg. Wait', value: this.formatWaitTime(stats.avgWaitingMonths), trend: 'Global benchmark' },
             { label: 'Successes', value: stats.nominatedApplications || 0, trend: 'Confirmed wins' },

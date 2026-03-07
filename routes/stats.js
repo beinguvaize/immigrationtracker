@@ -12,13 +12,26 @@ router.get('/', async (req, res) => {
     let whereClause = 'WHERE 1=1';
     const params = [];
 
-    if (program_type) {
+    if (stream) {
+      if (stream === 'All AIP') {
+        whereClause += ' AND program_type = ?';
+        params.push('AIP');
+      } else if (stream === 'NS PNP Express Entry') {
+        whereClause += ' AND program_type = ? AND stream = ?';
+        params.push('NS PNP', 'Express Entry');
+      } else if (stream === 'NS PNP Non Express Entry') {
+        whereClause += ' AND program_type = ? AND stream != ?';
+        params.push('NS PNP', 'Express Entry');
+      } else if (stream === 'All NS PNP') {
+        whereClause += ' AND program_type = ?';
+        params.push('NS PNP');
+      } else {
+        whereClause += ' AND stream = ?';
+        params.push(stream);
+      }
+    } else if (program_type) {
       whereClause += ' AND program_type = ?';
       params.push(program_type);
-    }
-    if (stream) {
-      whereClause += ' AND stream = ?';
-      params.push(stream);
     }
     if (noc_code) {
       whereClause += ' AND noc_code = ?';
@@ -136,13 +149,26 @@ router.get('/table', async (req, res) => {
     let whereClause = 'WHERE 1=1';
     const params = [];
 
-    if (program_type) {
+    if (stream) {
+      if (stream === 'All AIP') {
+        whereClause += ' AND program_type = ?';
+        params.push('AIP');
+      } else if (stream === 'NS PNP Express Entry') {
+        whereClause += ' AND program_type = ? AND stream = ?';
+        params.push('NS PNP', 'Express Entry');
+      } else if (stream === 'NS PNP Non Express Entry') {
+        whereClause += ' AND program_type = ? AND stream != ?';
+        params.push('NS PNP', 'Express Entry');
+      } else if (stream === 'All NS PNP') {
+        whereClause += ' AND program_type = ?';
+        params.push('NS PNP');
+      } else {
+        whereClause += ' AND stream = ?';
+        params.push(stream);
+      }
+    } else if (program_type) {
       whereClause += ' AND program_type = ?';
       params.push(program_type);
-    }
-    if (stream) {
-      whereClause += ' AND stream = ?';
-      params.push(stream);
     }
     if (noc_code) {
       whereClause += ' AND noc_code = ?';

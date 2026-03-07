@@ -10,7 +10,7 @@ const state = {
             noc_code: '',
             status: '',
             risk_level: '',
-            ns_graduate: ''
+            stream: ''
         },
         sort: 'submission_date',
         order: 'desc',
@@ -257,16 +257,17 @@ async function loadTableData() {
     tableBody.innerHTML = '<tr><td colspan="8"><div class="loading-spinner"></div></td></tr>';
 
     try {
-        const program = document.getElementById('filterProgram').value;
-        const stream = document.getElementById('filterStream').value;
+        const globalProgram = document.getElementById('filterProgram').value;
+        const globalStream = document.getElementById('filterStream').value;
+        const tableStream = state.table.filters.stream;
 
         const data = await api.getStatsTable({
-            program_type: program,
-            stream: stream,
+            // If table stream is selected, ignore global program to keep it "standalone"
+            program_type: tableStream ? '' : globalProgram,
+            stream: tableStream || globalStream,
             noc_code: state.table.filters.noc_code,
             status: state.table.filters.status,
             risk_level: state.table.filters.risk_level,
-            ns_graduate: state.table.filters.ns_graduate,
             sort: state.table.sort,
             order: state.table.order,
             page: state.table.page,
@@ -285,6 +286,9 @@ async function loadTableData() {
 
 // ===== FILTERS & CONTROLS =====
 function initFilters() {
+    // Initialize standalone table stream filter once
+    initTableStreamFilter();
+
     const filterIds = ['filterProgram', 'filterStream', 'filterNoc'];
     filterIds.forEach(id => {
         const el = document.getElementById(id);
@@ -297,18 +301,14 @@ function initFilters() {
         }
     });
 
-    const tableFilterIds = ['tableFilterNoc', 'tableFilterStatus', 'tableFilterRisk', 'tableFilterGraduate'];
+    const tableFilterIds = ['tableFilterNoc', 'tableFilterStatus', 'tableFilterRisk', 'tableFilterStream'];
     tableFilterIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('change', (e) => {
                 const field = id.replace('tableFilter', '').toLowerCase();
-                if (field === 'graduate') {
-                    state.table.filters.ns_graduate = e.target.value;
-                } else {
-                    const key = field === 'noc' ? 'noc_code' : field === 'risk' ? 'risk_level' : field;
-                    state.table.filters[key] = e.target.value;
-                }
+                const key = field === 'noc' ? 'noc_code' : field === 'risk' ? 'risk_level' : field;
+                state.table.filters[key] = e.target.value;
                 state.table.page = 1;
                 loadTableData();
             });
@@ -316,11 +316,48 @@ function initFilters() {
     });
 }
 
+function initTableStreamFilter() {
+    const tableStreamSelect = document.getElementById('tableFilterStream');
+    if (!tableStreamSelect) return;
+
+    let options = '<option value="">All Streams</option>';
+
+    // Grouped Options
+    options += '<optgroup label="Grouped Options">';
+    options += '<option value="All AIP">All AIP</option>';
+    options += '<option value="NS PNP Express Entry">NS PNP Express Entry</option>';
+    options += '<option value="NS PNP Non Express Entry">NS PNP Non Express Entry</option>';
+    options += '<option value="All NS PNP">All NS PNP</option>';
+    options += '</optgroup>';
+
+    // AIP Streams
+    options += '<optgroup label="Atlantic Immigration Program (AIP)">';
+    options += STREAMS['AIP'].map(s => `<option value="${s}">${s}</option>`).join('');
+    options += '</optgroup>';
+
+    // NS PNP Streams
+    options += '<optgroup label="Nova Scotia PNP">';
+    options += STREAMS['NS PNP'].map(s => `<option value="${s}">${s}</option>`).join('');
+    options += '</optgroup>';
+
+    tableStreamSelect.innerHTML = options;
+}
+
 function updateStreamOptions() {
     const program = document.getElementById('filterProgram').value;
     const streamSelect = document.getElementById('filterStream');
 
     let options = '<option value="">All Streams</option>';
+
+    // Add grouped options
+    if (program === 'NS PNP') {
+        options += '<option value="All NS PNP">All NS PNP</option>';
+        options += '<option value="NS PNP Express Entry">NS PNP Express Entry</option>';
+        options += '<option value="NS PNP Non Express Entry">NS PNP Non Express Entry</option>';
+    } else if (program === 'AIP') {
+        options += '<option value="All AIP">All AIP</option>';
+    }
+
     if (program && STREAMS[program]) {
         options += STREAMS[program].map(s => `<option value="${s}">${s}</option>`).join('');
     }
