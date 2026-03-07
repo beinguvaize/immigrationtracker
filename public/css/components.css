@@ -1220,6 +1220,19 @@
     letter-spacing: -0.02em;
 }
 
+.stat-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    color: #475569;
+}
+
+.stat-card__header i {
+    font-size: 14px;
+}
+
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);

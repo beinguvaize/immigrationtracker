@@ -226,19 +226,28 @@ const ui = {
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Avg. Waiting Time</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-clock"></i>
+                    <div class="stat-card__label">Avg. Waiting Time</div>
+                </div>
                 <div style="margin-top:var(--space-1); width:100%;">
                     ${getBreakdownLines('avg_waiting')}
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Nomination Success</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-medal"></i>
+                    <div class="stat-card__label">Nomination Success</div>
+                </div>
                 <div style="margin-top:var(--space-2);">
                     ${getBreakdownLines('pct_nominated')}
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-card__label">Longest Wait</div>
+                <div class="stat-card__header">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <div class="stat-card__label">Longest Wait</div>
+                </div>
                 <div style="margin-top:var(--space-2);">
                     ${getBreakdownLines('max_waiting')}
                 </div>
