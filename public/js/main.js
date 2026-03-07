@@ -130,6 +130,7 @@ function showApp() {
     loadUserData();
     loadAggregateData();
     loadTableData();
+    loadCommunityData();
     loadAnnouncement();
     initFilters();
     initTableControls();
@@ -249,6 +250,50 @@ function populateNocFilter(nocCodes, elementId) {
     el.innerHTML = '<option value="">All NOC Codes</option>' +
         nocCodes.map(n => `<option value="${n.noc_code}">${n.noc_code} (${n.count})</option>`).join('');
     el.value = currentVal;
+}
+
+// ===== COMMUNITY DATA =====
+async function loadCommunityData() {
+    try {
+        const [feedData, insightsData] = await Promise.all([
+            api.getActivityFeed(),
+            api.getInsights()
+        ]);
+
+        const activityEl = document.getElementById('activityFeedContainer');
+        if (activityEl) {
+            activityEl.innerHTML = ui.renderActivityFeed(feedData.feed);
+        }
+
+        const insightsEl = document.getElementById('insightsContainer');
+        if (insightsEl) {
+            insightsEl.innerHTML = ui.renderInsightsBanner(insightsData.batches);
+        }
+
+        // Check for "Similar to You" Alerts
+        checkPersonalAlerts(feedData.feed);
+
+    } catch (err) {
+        console.error('Failed to load community data', err);
+    }
+}
+
+function checkPersonalAlerts(feed) {
+    if (!state.apps || state.apps.length === 0 || !feed) return;
+
+    // Look for recent nominations matching user's NOC and Stream
+    const recentNominations = feed.filter(f =>
+        (f.status === 'Nominated' || f.status === 'Endorsed') &&
+        (new Date() - new Date(f.updated_at)) < (1000 * 60 * 60 * 24 * 7) // Last 7 days for visibility
+    );
+
+    state.apps.forEach(app => {
+        const match = recentNominations.find(n => n.noc_code === app.noc_code && n.stream === app.stream);
+        if (match) {
+            // Check if we already showed this session to avoid spam (optional)
+            ui.showToast(`🚀 Alert: Someone with NOC ${match.noc_code} in ${match.stream} just got Nominated!`, 'success');
+        }
+    });
 }
 
 // ===== TABLE DATA =====

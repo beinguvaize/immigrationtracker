@@ -94,6 +94,21 @@ const api = {
         return await res.json();
     },
 
+    async getActivityFeed() {
+        const res = await fetch(`${API_BASE}/stats/activity-feed`);
+        return await res.json();
+    },
+
+    async getNOCStats(code) {
+        const res = await fetch(`${API_BASE}/stats/noc/${code}`);
+        return await res.json();
+    },
+
+    async getInsights() {
+        const res = await fetch(`${API_BASE}/stats/insights`);
+        return await res.json();
+    },
+
     // Admin
     async getAdminDashboard() {
         const res = await fetch(`${API_BASE}/admin/dashboard`, { headers: this.getHeaders() });

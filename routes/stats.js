@@ -38,16 +38,32 @@ router.get('/', async (req, res) => {
       params.push(noc_code);
     }
 
-    // Aggregate statistics
-    const stats = await prepare(`
+    const statsResult = await prepare(`
       SELECT
         COUNT(*) as total_applicants,
+        SUM(CASE WHEN created_at <= datetime('now', '-30 days') THEN 1 ELSE 0 END) as total_prev,
         ROUND(AVG(waiting_months), 1) as avg_waiting_months,
         ROUND(MAX(waiting_months), 1) as max_waiting_months,
         ROUND(MIN(waiting_months), 1) as min_waiting_months,
         ROUND(100.0 * SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) / CASE WHEN COUNT(*) = 0 THEN 1 ELSE COUNT(*) END, 1) as pct_nominated
       FROM applications ${whereClause}
     `).get(...params);
+
+    // Calculate growth
+    const total_now = statsResult.total_applicants || 0;
+    const total_prev = statsResult.total_prev || 0;
+    let growth_pct = 0;
+    if (total_prev > 0) {
+      growth_pct = Math.round(((total_now - total_prev) / total_prev) * 100);
+    } else if (total_now > 0) {
+      growth_pct = 100; // If it went from 0 to N, we'll call it 100% for UI/UX
+    }
+
+    const stats = {
+      ...statsResult,
+      growth_pct,
+      growth_trend: growth_pct >= 0 ? 'up' : 'down'
+    };
 
     // Per-program breakdown stats
     const programBreakdown = await prepare(`
@@ -254,6 +270,84 @@ router.get('/table', async (req, res) => {
     });
   } catch (err) {
     console.error('Table error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ===== ACTIVITY FEED =====
+router.get('/activity-feed', async (req, res) => {
+  try {
+    const activity = await prepare(`
+      SELECT
+        program_type,
+        stream,
+        noc_code,
+        status,
+        submission_date,
+        nominated_date,
+        updated_at
+      FROM applications
+      ORDER BY updated_at DESC
+      LIMIT 15
+    `).all();
+
+    const feed = activity.map(row => {
+      const waiting = calculateWaitingTime(row.submission_date, row.status, row.nominated_date);
+      return {
+        ...row,
+        waiting_months: waiting.totalMonths
+      };
+    });
+
+    res.json({ feed });
+  } catch (err) {
+    console.error('Activity feed error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ===== NOC SPECIFIC STATS =====
+router.get('/noc/:code', async (req, res) => {
+  try {
+    const { code } = req.params;
+    const stats = await prepare(`
+      SELECT
+        COUNT(*) as total,
+        ROUND(AVG(waiting_months), 1) as avg_wait,
+        ROUND(MAX(waiting_months), 1) as max_wait,
+        ROUND(100.0 * SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) / CASE WHEN COUNT(*) = 0 THEN 1 ELSE COUNT(*) END, 1) as success_rate
+      FROM applications
+      WHERE noc_code = ?
+    `).get(code);
+
+    res.json({ noc: code, stats: stats || { total: 0, avg_wait: 0, max_wait: 0, success_rate: 0 } });
+  } catch (err) {
+    console.error('NOC stats error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ===== BATCH DETECTOR (INSIGHTS) =====
+router.get('/insights', async (req, res) => {
+  try {
+    // Look for clusters of nominations by submission month
+    const batches = await prepare(`
+      SELECT
+        strftime('%Y-%m', submission_date) as submission_month,
+        program_type,
+        COUNT(*) as nomination_count
+      FROM applications
+      WHERE status IN ('Nominated', 'Endorsed')
+      AND nominated_date >= datetime('now', '-60 days')
+      GROUP BY submission_month, program_type
+      HAVING nomination_count >= 3
+      ORDER BY submission_month DESC
+      LIMIT 5
+    `).all();
+
+    res.json({ batches });
+  } catch (err) {
+    console.error('Insights error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -117,8 +117,9 @@ function renderProgramChart(dist) {
             labels: dist.map(d => d.program_type),
             datasets: [{
                 data: dist.map(d => d.count),
-                backgroundColor: ['#14532d', '#10b981', '#f59e0b', '#ef4444'],
-                borderWidth: 0
+                backgroundColor: ['#055895', '#C5A059', '#10b981', '#94a3b8'], // NS Blue, NS Gold, Success Green, Muted gray
+                borderWidth: 2,
+                borderColor: '#ffffff'
             }]
         },
         options: {
