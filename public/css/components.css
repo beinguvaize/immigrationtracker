@@ -1145,6 +1145,15 @@
     border-color: var(--bg-accent);
 }
 
+.auth-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-bold);
+    color: #055895;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+}
+
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
