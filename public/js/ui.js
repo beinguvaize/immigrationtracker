@@ -358,14 +358,7 @@ const ui = {
 
     getStatusDateLabel(status, date) {
         if (!date) return '';
-        const verb = {
-            'Submitted': 'Submitted on',
-            'Selected for EOI': 'Selected on',
-            'Nominated': 'Nominated on',
-            'Endorsed': 'Endorsed on',
-            'Refused': 'Refused on'
-        }[status] || 'Updated on';
-        return `${verb} ${this.formatDate(date)}`;
+        return this.formatDate(date);
     },
 
     formatWaitTime(months) {
