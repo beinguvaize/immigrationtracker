@@ -1197,7 +1197,7 @@
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: #000000;
+    color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
