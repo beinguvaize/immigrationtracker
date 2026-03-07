@@ -834,7 +834,7 @@
 }
 
 .auth-card__logo img {
-    height: 130px;
+    height: 100px;
     width: auto;
     object-fit: contain;
     max-width: 100%;
