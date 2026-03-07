@@ -1217,6 +1217,101 @@
     color: var(--text-muted);
 }
 
+/* ── Premium Stat Card (Featured) ────────────────── */
+.stat-card--premium {
+    background: linear-gradient(135deg, #329dfa 0%, #055895 100%);
+    border: none;
+    box-shadow: 0 20px 40px -10px rgba(5, 88, 149, 0.45);
+    padding: var(--space-7);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card--premium::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 180px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.stat-card__premium-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    z-index: 1;
+    position: relative;
+}
+
+.stat-card__premium-icon {
+    width: 52px;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card__premium-label {
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    opacity: 0.9;
+    color: white !important;
+}
+
+.stat-card__premium-value {
+    font-size: 64px;
+    font-weight: 800;
+    margin-bottom: var(--space-6);
+    line-height: 1;
+    z-index: 1;
+    position: relative;
+    text-align: center;
+    letter-spacing: -0.02em;
+    color: white !important;
+}
+
+.stat-card__premium-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-size: 15px;
+    padding-top: var(--space-5);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 1;
+    position: relative;
+}
+
+.stat-card__premium-trend .trend-val {
+    color: #4ade80 !important;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-card__premium-trend .trend-label {
+    opacity: 0.85;
+    color: white !important;
+}
+
 .stat-card--featured .stat-card__label {
     color: rgba(255, 255, 255, 0.85);
 }
@@ -1227,11 +1322,6 @@
 
 .stat-card--featured .stat-card__trend {
     color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.stat-card--featured .stat-card__trend {
-    color: var(--text-accent);
-    opacity: 0.7;
 }
 
 /* ── Status Pill: Selected for EOI ────────────────── */

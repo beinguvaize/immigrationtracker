@@ -210,13 +210,19 @@ const ui = {
         };
 
         return `
-            <div class="stat-card stat-card--featured">
-                <div class="stat-card__label">Total Applicants</div>
-                <div class="stat-card__value" style="font-size: var(--fs-3xl); margin: var(--space-2) 0;">
+            <div class="stat-card stat-card--premium">
+                <div class="stat-card__premium-header">
+                    <div class="stat-card__premium-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="stat-card__premium-label">Total Applicants</div>
+                </div>
+                <div class="stat-card__premium-value">
                     ${stats.total_applicants}
                 </div>
-                <div class="stat-card__trend trend--up" style="font-size:11px; color:var(--text-muted);">
-                    Increased from last month
+                <div class="stat-card__premium-trend">
+                    <span class="trend-val"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                    <span class="trend-label">from last month</span>
                 </div>
             </div>
             <div class="stat-card">
