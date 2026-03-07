@@ -202,9 +202,9 @@ const ui = {
                 let val = p[field];
                 if (field === 'pct_nominated') val = (val || 0) + '%';
                 else if (field === 'avg_waiting' || field === 'max_waiting') val = this.formatWaitTime(val);
-                return `<div style="display:flex; flex-direction:column; align-items:center; padding:4px 0; border-top:1px solid rgba(0,0,0,0.05); width:100%;">
-                    <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${p.program_type}</div>
-                    <div style="font-size:var(--fs-md); font-weight:800; color:var(--text-primary);">${val}</div>
+                return `<div style="display:flex; flex-direction:column; align-items:center; padding:4px 0; border-top:1px solid rgba(255,255,255,0.1); width:100%;">
+                    <div style="font-size:10px; color:rgba(255,255,255,0.7); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">${p.program_type}</div>
+                    <div style="font-size:var(--fs-md); font-weight:800; color:white;">${val}</div>
                 </div>`;
             }).join('');
         };
@@ -318,9 +318,10 @@ const ui = {
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
                 <td style="text-align:center;" class="cell-mono">${row.days_remaining != null ? this.formatWaitTime(row.days_remaining / 30.44) : '—'}</td>
                 <td>
-                    <span class="cell-risk cell-risk--${row.risk_level}">
+                    <div class="risk-indicator risk-indicator--${row.risk_level}" style="display:flex; align-items:center; gap:var(--space-2);">
+                        <span class="risk-indicator__icon">${this.getRiskIcon(row.risk_level)}</span>
                         ${this.getRiskLabel(row.risk_level)}
-                    </span>
+                    </div>
                 </td>
                 <td style="text-align: center;">${row.ns_graduate ? '<i class="fa-solid fa-user-graduate" style="color:var(--ns-blue)"></i>' : '—'}</td>
                 <td style="text-align: center; font-size:12px;">

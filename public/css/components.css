@@ -423,14 +423,25 @@
 }
 
 .stat-card {
-    background: var(--bg-card);
+    background: var(--ns-blue);
+    color: white;
     padding: var(--space-6);
     border-radius: var(--radius-xl);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
     transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-accent-hover);
+}
+
+.stat-card .job-title-cell {
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* ── Dashboard Grid & Charts ───────────────────────── */
@@ -1170,8 +1181,9 @@
 
 /* ── Stat Card Refinements ────────────────────────── */
 .stat-card--featured {
-    background: var(--bg-accent-light);
-    border-color: var(--bg-accent);
+    background: var(--ns-blue);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(5, 88, 149, 0.2);
 }
 
 .auth-card__title {
@@ -1186,20 +1198,31 @@
 .stat-card__label {
     font-size: var(--fs-xs);
     font-weight: var(--fw-bold);
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.85);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
+}
+
+.stat-card__value {
+    color: white !important;
+}
+
+.stat-card__trend {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.stat-card .job-title-cell {
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .stat-card--featured .stat-card__label {
-    color: var(--text-accent);
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .stat-card__value {
     font-size: var(--fs-2xl);
     font-weight: 900;
-    color: var(--text-primary);
+    color: white !important;
 }
 
 .stat-card--featured .stat-card__value {
