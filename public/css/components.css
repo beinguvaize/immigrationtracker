@@ -1254,6 +1254,7 @@
     z-index: 1;
     position: relative;
     width: 100%;
+    flex-wrap: nowrap;
 }
 
 .stat-card__premium-icon {
