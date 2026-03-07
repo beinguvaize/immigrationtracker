@@ -55,6 +55,12 @@
     color: var(--text-on-accent);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.badge-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .badge-card__title {
@@ -435,8 +441,8 @@
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card .job-title-cell {
@@ -515,6 +521,12 @@
     border: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 640px) {
@@ -801,6 +813,12 @@
     padding: var(--space-10);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-xl);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
 .auth-card__header {
@@ -918,6 +936,13 @@
     padding: var(--space-6);
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--space-6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.table-card:hover,
+.widget-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .widget-card__title {
