@@ -214,7 +214,8 @@ router.get('/table', async (req, res) => {
         status_note,
         ns_graduate,
         has_case_number,
-        case_number_date
+        case_number_date,
+        updated_at
       FROM applications
       ${whereClause}
       ORDER BY ${sortCol} ${sortOrder}
@@ -237,7 +238,8 @@ router.get('/table', async (req, res) => {
         status_note: row.status_note,
         ns_graduate: row.ns_graduate,
         has_case_number: row.has_case_number,
-        case_number_date: row.case_number_date
+        case_number_date: row.case_number_date,
+        updated_at: row.updated_at
       };
     });
 

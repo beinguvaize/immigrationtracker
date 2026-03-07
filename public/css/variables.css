@@ -3,9 +3,9 @@
   --bg-primary: #f1f5f9;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f8fafc;
-  --bg-accent: #0589e0;
-  --bg-accent-light: #dcfce7;
-  --bg-accent-hover: #045488;
+  --bg-accent: #055895;
+  --bg-accent-light: #eff6ff;
+  --bg-accent-hover: #044677;
 
   --bg-card: #ffffff;
   --bg-glass: rgba(255, 255, 255, 0.7);
@@ -15,39 +15,43 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   --text-on-accent: #ffffff;
-  --text-accent: #045488;
+  --text-accent: #055895;
 
   --border-light: #f1f5f9;
   --border-medium: #e2e8f0;
   --border-subtle: rgba(0, 0, 0, 0.04);
-  --border-accent: rgba(5, 137, 224, 0.2);
+  --border-accent: rgba(5, 88, 149, 0.2);
 
-  /* Accents */
-  --accent-green: #035388;
-  --accent-green-hover: #045488;
-  --accent-green-alpha: rgba(5, 137, 224, 0.1);
+  /* Accents - Nova Scotia Blue & Gold */
+  --ns-blue: #055895;
+  --ns-gold: #C5A059;
+  --ns-gold-light: #f9f6f0;
+
+  --accent-primary: var(--ns-blue);
+  --accent-secondary: var(--ns-gold);
+
   --accent-success: #10b981;
-  --accent-warning: #f59e0b;
+  --accent-warning: #C5A059;
   --accent-danger: #ef4444;
-  --accent-info: #0ea5e9;
+  --accent-info: #055895;
 
   /* Status Colors */
   --success: #10b981;
   --success-bg: #ecfdf5;
-  --warning: #f59e0b;
-  --warning-bg: #fffbe6;
+  --warning: #C5A059;
+  --warning-bg: #fdfaf3;
   --danger: #ef4444;
   --danger-bg: #fef2f2;
-  --info: #0ea5e9;
-  --info-bg: #f0f9ff;
-  --pending: #f59e0b;
-  --pending-bg: #fffbe6;
-  --nominated: #10b981;
-  --nominated-bg: #ecfdf5;
+  --info: #055895;
+  --info-bg: #eff6ff;
+  --pending: #C5A059;
+  --pending-bg: #fdfaf3;
+  --nominated: #055895;
+  --nominated-bg: #eff6ff;
   --refused: #ef4444;
   --refused-bg: #fef2f2;
-  --expired: #6366f1;
-  --expired-bg: #eef2ff;
+  --expired: #64748b;
+  --expired-bg: #f8fafc;
 
   /* Typography */
   --font-main: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;

@@ -607,19 +607,30 @@
     border-radius: var(--radius-lg);
     font-weight: var(--fw-bold);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.05);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 /* Modern Animated Button - The "Beautiful" Request */
 .btn--modern {
     border-radius: var(--radius-full);
     padding: var(--space-3) var(--space-8);
-    background: linear-gradient(135deg, var(--bg-accent), var(--accent-green-hover));
+    background: linear-gradient(135deg, var(--ns-blue), #0a6ab3);
     color: var(--text-on-accent);
-    box-shadow: 0 4px 15px var(--accent-green-alpha);
+    box-shadow: 0 4px 15px rgba(5, 88, 149, 0.2);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 1;
 }
@@ -640,9 +651,9 @@
 }
 
 .btn--modern:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 25px var(--accent-green-alpha);
-    filter: brightness(1.1);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(5, 88, 149, 0.3);
+    border: 1px solid rgba(197, 160, 89, 0.3);
 }
 
 .btn--modern:hover::before {
@@ -650,8 +661,7 @@
 }
 
 .btn--modern:active {
-    transform: translateY(0) scale(0.96);
-    box-shadow: 0 4px 10px var(--accent-green-alpha);
+    transform: translateY(-1px) scale(0.98);
 }
 
 .btn--primary {
