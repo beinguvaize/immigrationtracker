@@ -272,7 +272,9 @@ const ui = {
 
             return `
             <div class="success-card">
-                <div class="success-card__icon">🏆</div>
+                <div class="success-card__icon">
+                    <div class="success-card__icon-wrapper">🏆</div>
+                </div>
                 <div class="success-card__body">
                     <div class="success-card__title">${jobTitle}</div>
                     <div class="success-card__meta">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
