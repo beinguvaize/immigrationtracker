@@ -82,6 +82,11 @@ function initAuth() {
         const email = document.getElementById('authEmail').value;
         const password = document.getElementById('authPassword').value;
         const errorEl = document.getElementById('authError');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const originalBtnText = submitBtn.innerText;
+
+        // Hide errors and reset state
+        errorEl.classList.add('hidden');
 
         // Validate password match on signup
         if (!isLogin) {
@@ -93,12 +98,34 @@ function initAuth() {
             }
         }
 
+        // 1. Loading State
+        submitBtn.classList.add('btn--loading');
+        submitBtn.disabled = true;
+
         try {
             const data = isLogin ? await api.login(email, password) : await api.register(email, password);
             state.user = data.user;
-            showApp();
-            ui.showToast(`Welcome, ${state.user.email}!`, 'success');
+
+            // 2. Success State
+            submitBtn.classList.remove('btn--loading');
+            submitBtn.classList.add('btn--success');
+
+            // Wait briefly to show the checkmark, then transition
+            setTimeout(() => {
+                showApp();
+                ui.showToast(`Welcome, ${state.user.email}!`, 'success');
+                // Reset button for future logouts
+                submitBtn.classList.remove('btn--success');
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            }, 800);
+
         } catch (err) {
+            // Restore button on error
+            submitBtn.classList.remove('btn--loading');
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+
             errorEl.innerText = err.message;
             errorEl.classList.remove('hidden');
         }
@@ -561,17 +588,20 @@ function toggleNominatedDateField() {
     const status = document.getElementById('appStatus').value;
     const container = document.getElementById('nominatedDateContainer');
     const label = document.getElementById('nominatedDateLabel');
+    const input = document.getElementById('nominatedDate');
 
     if (status === 'Nominated' || status === 'Endorsed' || status === 'Selected for EOI') {
         container.classList.remove('hidden');
+        input.setAttribute('required', 'required'); // Force HTML validation
         if (status === 'Selected for EOI') {
-            label.innerText = 'Selection Date';
+            label.innerText = 'Selection Date *';
         } else {
-            label.innerText = 'When were you nominated?';
+            label.innerText = 'When were you nominated? *';
         }
     } else {
         container.classList.add('hidden');
-        document.getElementById('nominatedDate').value = '';
+        input.removeAttribute('required'); // Remove HTML validation
+        input.value = '';
     }
 }
 
@@ -627,7 +657,7 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
         ns_graduate: document.getElementById('nsGraduate').checked,
         has_case_number: hasCaseNum,
         case_number_date: hasCaseNum ? document.getElementById('caseNumberDate').value : null,
-        nominated_date: document.getElementById('appStatus').value === 'Nominated' ? document.getElementById('nominatedDate').value : null
+        nominated_date: (document.getElementById('appStatus').value === 'Nominated' || document.getElementById('appStatus').value === 'Endorsed' || document.getElementById('appStatus').value === 'Selected for EOI') ? document.getElementById('nominatedDate').value : null
     };
 
     const submitBtn = document.getElementById('modalSubmitBtn');

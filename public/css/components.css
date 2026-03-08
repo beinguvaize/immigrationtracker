@@ -841,22 +841,23 @@
     align-items: center;
     justify-content: center;
     padding: var(--space-6);
-    background: var(--bg-primary);
+    background: #f0f4f8;
+    /* Soft grey background like the screenshot */
 }
 
 .auth-card {
-    background: var(--bg-secondary);
+    background: #ffffff;
     width: 100%;
     max-width: 440px;
-    padding: var(--space-10);
+    padding: var(--space-10) var(--space-8);
     border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .auth-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
 }
 
 .auth-card__header {
@@ -872,10 +873,62 @@
 }
 
 .auth-card__logo img {
-    height: 130px;
+    height: 100px;
+    /* Matched to be slightly smaller than the previous 130px but fitting the clean look */
     width: auto;
     object-fit: contain;
     max-width: 100%;
+}
+
+.auth-card__title {
+    font-size: var(--fs-2xl);
+    color: var(--ns-blue);
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+}
+
+.auth-card__desc {
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+}
+
+/* ── Form Inputs specifically for Auth Card ── */
+.auth-card__form .form-group {
+    margin-bottom: var(--space-5);
+}
+
+.auth-card__form .form-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.auth-card__form .form-input {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+}
+
+.auth-card__form .form-input:focus {
+    background: #ffffff;
+    border-color: var(--ns-blue);
+    box-shadow: 0 0 0 3px rgba(5, 88, 149, 0.1);
+}
+
+.auth-card__form .btn {
+    border-radius: 9999px;
+    /* Fully rounded pill shape */
+    padding: 14px 24px;
+    font-size: var(--fs-md);
+    font-weight: 700;
+    margin-top: var(--space-2);
 }
 
 @media (max-width: 480px) {
@@ -1016,10 +1069,73 @@
     }
 }
 
+/* ── Sidebar WhatsApp Card ────────────────────── */
+.side-nav__cta {
+    padding: var(--space-4) var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.cta-card {
+    background: var(--nominated-bg);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.cta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.25);
+}
+
+.cta-card__icon {
+    width: 32px;
+    height: 32px;
+    background: white;
+    color: #25D366;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.cta-card__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.cta-card__text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+}
+
 /* ── WhatsApp Community Button ────────────────── */
 .btn--whatsapp {
     background-color: #25D366 !important;
     color: white !important;
+    text-decoration: none !important;
 }
 
 .btn--whatsapp:hover {
@@ -1981,6 +2097,35 @@
 .status-text--danger {
     color: #dc2626;
     background: #fef2f2 !important;
+}
+
+/* ── Toasts ───────────────────────────────────────── */
+.toast-container {
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xl);
+    border-left: 4px solid var(--border-medium);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    font-size: var(--fs-sm);
+    font-weight: 500;
 }
 
 .pulse-ring {

@@ -61,7 +61,7 @@ const ui = {
                             <div class="status-pill__dot"></div>
                             ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
                         </div>
-                        <div class="status-date">${this.getStatusDateLabel(app.status, app.updated_at)}</div>
+                        <div class="status-date">${this.getStatusDateLabel(app)}</div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(app.waiting_months)}</td>
@@ -331,8 +331,12 @@ const ui = {
                 <td>${this.formatDate(row.submission_date)}</td>
                 <td>
                     <div class="status-column">
-                        <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</div>
-                        <div class="status-date">${this.getStatusDateLabel(row.status, row.updated_at)}</div>
+                        <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">
+                            ${row.status === 'Nominated' ? 'NOMINATED / ENDORSED' : row.status.toUpperCase()}
+                        </div>
+                        <div class="status-date" style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">
+                            ${this.getStatusDateLabel(row)}
+                        </div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
@@ -377,7 +381,14 @@ const ui = {
         `;
     },
 
-    getStatusDateLabel(status, date) {
+    getStatusDateLabel(app) {
+        let date = app.updated_at;
+
+        // Use the specifically entered nominated_date for these statuses
+        if ((app.status === 'Nominated' || app.status === 'Endorsed' || app.status === 'Selected for EOI') && app.nominated_date) {
+            date = app.nominated_date;
+        }
+
         if (!date) return '';
         return `on ${this.formatDate(date)}`;
     },
@@ -400,8 +411,8 @@ const ui = {
             // Convert "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SS"
             normalized = dateStr.replace(' ', 'T');
         } else if (!dateStr.includes('T')) {
-            // Force local time for "YYYY-MM-DD"
-            normalized = dateStr + 'T00:00:00';
+            // Force local time parser exactly at noon to avoid any midnight timezone shifting
+            normalized = dateStr + 'T12:00:00';
         }
 
         const date = new Date(normalized);
