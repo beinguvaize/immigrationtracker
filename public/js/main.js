@@ -167,12 +167,31 @@ function initNavigation() {
 
 async function loadAnnouncement() {
     try {
-        const data = await api.getActiveAnnouncement();
+        const { announcements } = await api.getActiveAnnouncement();
         const bannerContainer = document.getElementById('systemAnnouncement');
+        if (!bannerContainer) return;
+
         const textContainer = bannerContainer.querySelector('.announcement-text');
 
-        if (data && data.announcement) {
-            textContainer.innerText = data.announcement.message;
+        // Filter by program targeting
+        const userPrograms = state.apps ? [...new Set(state.apps.map(a => a.program_type))] : [];
+        const filtered = announcements.filter(a =>
+            a.target_program === 'All' || userPrograms.includes(a.target_program)
+        );
+
+        if (filtered.length > 0) {
+            // Find most recent urgent announcement
+            const urgent = filtered.find(a => a.priority === 'urgent');
+            const display = urgent || filtered[0];
+
+            textContainer.innerText = display.message;
+
+            // Priority styling
+            bannerContainer.className = 'announcement-banner'; // Reset
+            if (display.priority === 'urgent') {
+                bannerContainer.classList.add('announcement-banner--urgent');
+            }
+
             bannerContainer.classList.remove('hidden');
         } else {
             bannerContainer.classList.add('hidden');

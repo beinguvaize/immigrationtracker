@@ -21,7 +21,8 @@ router.get('/dashboard', async (req, res) => {
 
         // Recent registrations (last 7 days)
         const recentUsers = await prepare(`
-      SELECT id, email, role, created_at
+      SELECT id, email, role, created_at, last_login_at,
+        (SELECT COUNT(*) FROM applications WHERE user_id = users.id) as app_count
       FROM users WHERE id > 0
       ORDER BY created_at DESC
       LIMIT 10
@@ -51,6 +52,95 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
+// ===== ANALYTICS & INSIGHTS =====
+
+// NOC Leaderboard: Top NOCs by applications and nominations
+router.get('/analytics/noc-leaderboard', async (req, res) => {
+    try {
+        const leaderboard = await prepare(`
+            SELECT noc_code, 
+                   COUNT(*) as total_apps,
+                   SUM(CASE WHEN status IN ('Nominated', 'Endorsed') THEN 1 ELSE 0 END) as nominations
+            FROM applications
+            GROUP BY noc_code
+            ORDER BY total_apps DESC
+            LIMIT 10
+        `).all();
+        res.json({ leaderboard });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Monthly Trends: Submissions over time (last 12 months)
+router.get('/analytics/monthly-trends', async (req, res) => {
+    try {
+        const trends = await prepare(`
+            SELECT strftime('%Y-%m', submission_date) as month,
+                   COUNT(*) as count
+            FROM applications
+            WHERE submission_date >= date('now', '-12 months')
+            GROUP BY month
+            ORDER BY month ASC
+        `).all();
+        res.json({ trends });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// User Growth: Signups per month
+router.get('/analytics/user-growth', async (req, res) => {
+    try {
+        const growth = await prepare(`
+            SELECT strftime('%Y-%m', created_at) as month,
+                   COUNT(*) as count
+            FROM users
+            WHERE id > 0
+            GROUP BY month
+            ORDER BY month ASC
+        `).all();
+        res.json({ growth });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// User Summary: Active vs Inactive
+router.get('/analytics/user-summary', async (req, res) => {
+    try {
+        const total = await prepare('SELECT COUNT(*) as c FROM users WHERE id > 0').get();
+        const inactive = await prepare(`
+            SELECT COUNT(*) as c 
+            FROM users 
+            WHERE id > 0 
+            AND (last_login_at < datetime('now', '-30 days') OR last_login_at IS NULL AND created_at < datetime('now', '-30 days'))
+        `).get();
+
+        res.json({
+            total: total?.c || 0,
+            inactive: inactive?.c || 0,
+            active: (total?.c || 0) - (inactive?.c || 0)
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Risk Breakdown: Detailed count of each risk level
+router.get('/analytics/risk-breakdown', async (req, res) => {
+    try {
+        const breakdown = await prepare(`
+            SELECT risk_level, COUNT(*) as count
+            FROM applications
+            GROUP BY risk_level
+        `).all();
+        res.json({ breakdown });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ===== USER MANAGEMENT =====
 router.get('/users', async (req, res) => {
     try {
@@ -75,7 +165,7 @@ router.get('/users', async (req, res) => {
         const total = await prepare(`SELECT COUNT(*) as c FROM users ${whereClause}`).get(...params);
 
         const users = await prepare(`
-      SELECT u.id, u.email, u.role, u.created_at,
+      SELECT u.id, u.email, u.role, u.created_at, u.last_login_at,
         (SELECT COUNT(*) FROM applications WHERE user_id = u.id) as app_count
       FROM users u
       ${whereClause}
@@ -341,11 +431,22 @@ router.get('/announcements', async (req, res) => {
 
 router.post('/announcements', async (req, res) => {
     try {
-        const { message, active } = req.body;
+        const { message, active, priority, target_program, scheduled_at, expires_at } = req.body;
         if (!message) return res.status(400).json({ error: 'Message required' });
 
         const isActive = active !== undefined ? active : 1;
-        await prepare('INSERT INTO announcements (message, active) VALUES (?, ?)').run(message, isActive ? 1 : 0);
+        await prepare(`
+            INSERT INTO announcements 
+            (message, active, priority, target_program, scheduled_at, expires_at) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).run(
+            message,
+            isActive ? 1 : 0,
+            priority || 'normal',
+            target_program || 'All',
+            scheduled_at || null,
+            expires_at || null
+        );
         res.json({ message: 'Announcement created' });
     } catch (err) {
         console.error('Admin create announcement error:', err);
@@ -356,8 +457,26 @@ router.post('/announcements', async (req, res) => {
 router.put('/announcements/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { active } = req.body;
-        await prepare('UPDATE announcements SET active = ? WHERE id = ?').run(active ? 1 : 0, parseInt(id));
+        const { message, active, priority, target_program, scheduled_at, expires_at } = req.body;
+
+        await prepare(`
+            UPDATE announcements 
+            SET message = COALESCE(?, message),
+                active = COALESCE(?, active),
+                priority = COALESCE(?, priority),
+                target_program = COALESCE(?, target_program),
+                scheduled_at = ?,
+                expires_at = ?
+            WHERE id = ?
+        `).run(
+            message,
+            active !== undefined ? (active ? 1 : 0) : null,
+            priority,
+            target_program,
+            scheduled_at,
+            expires_at,
+            parseInt(id)
+        );
         res.json({ message: 'Announcement updated' });
     } catch (err) {
         console.error('Admin update announcement error:', err);

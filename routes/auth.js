@@ -55,9 +55,21 @@ router.post('/login', async (req, res) => {
         }
 
         const valid = await bcrypt.compare(password, user.password_hash);
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
         if (!valid) {
+            await prepare('INSERT INTO login_activity (user_id, email, type, success, ip_address) VALUES (?, ?, ?, ?, ?)')
+                .run(user.id, email, 'failed_login', 0, ip);
             return res.status(401).json({ error: 'Invalid credentials' });
         }
+
+        // Update last login
+        const now = new Date().toISOString();
+        await prepare('UPDATE users SET last_login_at = ? WHERE id = ?').run(now, user.id);
+
+        // Log activity
+        await prepare('INSERT INTO login_activity (user_id, email, type, success, ip_address) VALUES (?, ?, ?, ?, ?)')
+            .run(user.id, email, 'login', 1, ip);
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 

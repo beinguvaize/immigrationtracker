@@ -355,8 +355,19 @@ router.get('/insights', async (req, res) => {
 // ===== PUBLIC ANNOUNCEMENTS =====
 router.get('/announcements/active', async (req, res) => {
   try {
-    const announcements = await prepare('SELECT message, created_at FROM announcements WHERE active = 1 ORDER BY created_at DESC LIMIT 1').all();
-    res.json({ announcement: announcements.length > 0 ? announcements[0] : null });
+    const now = new Date().toISOString();
+
+    // Get all active announcements that are currently within their scheduled time
+    const announcements = await prepare(`
+      SELECT message, priority, target_program, created_at 
+      FROM announcements 
+      WHERE active = 1 
+      AND (scheduled_at IS NULL OR scheduled_at <= ?)
+      AND (expires_at IS NULL OR expires_at >= ?)
+      ORDER BY priority DESC, created_at DESC
+    `).all(now, now);
+
+    res.json({ announcements });
   } catch (err) {
     console.error('Active announcements error:', err);
     res.status(500).json({ error: 'Internal server error' });

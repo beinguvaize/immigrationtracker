@@ -76,13 +76,25 @@ async function loadPanelData(panel) {
 // ===== DASHBOARD OVERVIEW =====
 async function loadDashboard() {
     try {
-        const data = await api.getAdminDashboard();
-        adminState.stats = data;
+        const [dashboard, nocData, trendData, riskData] = await Promise.all([
+            api.getAdminDashboard(),
+            api.getAdminNOCLeaderboard(),
+            api.getAdminMonthlyTrends(),
+            api.getAdminRiskBreakdown()
+        ]);
 
-        document.getElementById('adminStatsGrid').innerHTML = ui.renderAdminStats(data);
-        renderRecentUsers(data.recentUsers);
-        renderProgramChart(data.programDistribution);
+        adminState.stats = dashboard;
+
+        document.getElementById('adminStatsGrid').innerHTML = ui.renderAdminStats(dashboard);
+        renderRecentUsers(dashboard.recentUsers);
+
+        // Render New Charts
+        renderMonthlyTrendChart(trendData.trends);
+        renderNocLeaderboardChart(nocData.leaderboard);
+        renderRiskBreakdownChart(riskData.breakdown);
+
     } catch (err) {
+        console.error('Failed to load admin dashboard', err);
         ui.showToast('Failed to load admin dashboard', 'error');
     }
 }
@@ -91,44 +103,125 @@ function renderRecentUsers(users) {
     const list = document.getElementById('recentUsersList');
     list.innerHTML = users.map(u => `
         <tr>
-            <td>${u.email}</td>
+            <td>
+                <div style="font-weight:600">${u.email}</div>
+                <div style="font-size:10px; color:var(--text-muted)">ID: ${u.id}</div>
+            </td>
             <td><span class="role-badge role-badge--${u.role}">${u.role}</span></td>
-            <td>${ui.formatDate(u.created_at)}</td>
+            <td style="text-align: center;">${u.app_count || 0}</td>
+            <td style="font-size: 11px;">${ui.formatDate(u.created_at)}</td>
+            <td style="font-size: 11px;">${u.last_login_at ? ui.formatDate(u.last_login_at) : 'Never'}</td>
+            <td>
+                <button class="btn btn--secondary btn--sm" style="padding: 2px 6px; font-size: 10px;" onclick="document.querySelector('[data-panel=\'users\']').click()">Manage</button>
+            </td>
         </tr>
     `).join('');
 }
 
-let programChart = null;
-function renderProgramChart(dist) {
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js not loaded, skipping chart render.');
-        return;
-    }
+let monthlyTrendChart = null;
+function renderMonthlyTrendChart(trends) {
+    const canvas = document.getElementById('adminMonthlyTrendChart');
+    if (!canvas || typeof Chart === 'undefined') return;
 
-    const canvas = document.getElementById('adminProgramChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (programChart) programChart.destroy();
-
-    programChart = new Chart(ctx, {
-        type: 'doughnut',
+    if (monthlyTrendChart) monthlyTrendChart.destroy();
+    monthlyTrendChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
         data: {
-            labels: dist.map(d => d.program_type),
+            labels: trends.map(t => {
+                const [y, m] = t.month.split('-');
+                return new Date(y, m - 1).toLocaleString('default', { month: 'short' });
+            }),
             datasets: [{
-                data: dist.map(d => d.count),
-                backgroundColor: ['#055895', '#C5A059', '#10b981', '#94a3b8'], // NS Blue, NS Gold, Success Green, Muted gray
-                borderWidth: 2,
-                borderColor: '#ffffff'
+                label: 'Submissions',
+                data: trends.map(t => t.count),
+                borderColor: '#055895',
+                backgroundColor: 'rgba(5, 88, 149, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#055895'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+let nocLeaderboardChart = null;
+function renderNocLeaderboardChart(leaderboard) {
+    const canvas = document.getElementById('adminNocLeaderboardChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (nocLeaderboardChart) nocLeaderboardChart.destroy();
+    nocLeaderboardChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: leaderboard.map(l => l.noc_code),
+            datasets: [
+                {
+                    label: 'Applications',
+                    data: leaderboard.map(l => l.total_apps),
+                    backgroundColor: '#055895'
+                },
+                {
+                    label: 'Nominations',
+                    data: leaderboard.map(l => l.nominations),
+                    backgroundColor: '#C5A059'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
             plugins: {
-                legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Outfit' } } }
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
             },
-            cutout: '70%'
+            scales: {
+                x: { stacked: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+                y: { stacked: false, grid: { display: false } }
+            }
+        }
+    });
+}
+
+let riskBreakdownChart = null;
+function renderRiskBreakdownChart(breakdown) {
+    const canvas = document.getElementById('adminRiskBreakdownChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const colors = {
+        green: '#10b981',
+        yellow: '#C5A059',
+        red: '#ef4444',
+        expired: '#64748b'
+    };
+
+    if (riskBreakdownChart) riskBreakdownChart.destroy();
+    riskBreakdownChart = new Chart(canvas.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: breakdown.map(b => b.risk_level.toUpperCase()),
+            datasets: [{
+                data: breakdown.map(b => b.count),
+                backgroundColor: breakdown.map(b => colors[b.risk_level] || '#94a3b8'),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: { position: 'right', labels: { boxWidth: 12, padding: 15 } }
+            }
         }
     });
 }
@@ -138,12 +231,29 @@ async function loadUsers() {
     try {
         const search = document.getElementById('userSearch').value;
         const role = document.getElementById('userFilterRole').value;
+        const onlyInactive = document.getElementById('userFilterInactive')?.checked;
+
         const data = await api.getAdminUsers({ search, role });
 
+        // Frontend filtering for inactive (could also be done on backend, but let's keep it simple for now)
+        let filteredUsers = data.users;
+        if (onlyInactive) {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            filteredUsers = filteredUsers.filter(u => {
+                const lastLogin = u.last_login_at ? new Date(u.last_login_at) : null;
+                const joined = new Date(u.created_at);
+                return (lastLogin && lastLogin < thirtyDaysAgo) || (!lastLogin && joined < thirtyDaysAgo);
+            });
+        }
+
         const tbody = document.getElementById('userTableBody');
-        tbody.innerHTML = data.users.map(u => `
+        tbody.innerHTML = filteredUsers.map(u => `
             <tr>
-                <td style="font-weight: 600;">${u.email}</td>
+                <td style="font-weight: 600;">
+                    ${u.email}
+                    ${u.role === 'admin' ? '<i class="fa-solid fa-shield-halved" style="margin-left:5px; color:var(--ns-blue); font-size:10px;"></i>' : ''}
+                </td>
                 <td>
                     <select class="form-select btn--sm" style="padding: 2px 8px; font-size: 11px;" onchange="admin.updateUserRole(${u.id}, this.value)">
                         <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
@@ -151,7 +261,10 @@ async function loadUsers() {
                     </select>
                 </td>
                 <td style="text-align: center;">${u.app_count}</td>
-                <td>${ui.formatDate(u.created_at)}</td>
+                <td style="font-size: 11px;">${ui.formatDate(u.created_at)}</td>
+                <td style="font-size: 11px; color: ${u.last_login_at ? 'var(--text-primary)' : 'var(--text-muted)'}">
+                    ${u.last_login_at ? ui.formatDate(u.last_login_at) : 'Never'}
+                </td>
                 <td>
                     <button class="btn btn--danger btn--sm" onclick="admin.deleteUser(${u.id})">Delete</button>
                 </td>
@@ -207,25 +320,31 @@ async function loadAdminApps() {
 // ===== ANNOUNCEMENTS =====
 async function loadAnnouncements() {
     try {
-        const data = await api.getAdminAnnouncements();
+        const { announcements } = await api.getAdminAnnouncements();
         const tbody = document.getElementById('announcementsTableBody');
-
-        if (data.announcements.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No announcements created yet.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = data.announcements.map(a => `
+        tbody.innerHTML = announcements.map(a => `
             <tr>
-                <td><strong>${a.message}</strong></td>
-                <td>${ui.formatDate(a.created_at)}</td>
+                <td style="font-weight: 500;">${a.message}</td>
+                <td><span class="badge badge--outline">${a.target_program}</span></td>
                 <td>
-                    <span class="status-pill status-pill--${a.active ? 'nominated' : 'refused'}" style="cursor: pointer;" onclick="admin.toggleAnnouncement(${a.id}, ${!a.active})">
-                        ${a.active ? 'Active' : 'Inactive'}
+                    <span class="badge badge--${a.priority === 'urgent' ? 'danger' : 'success'}">
+                        ${a.priority.toUpperCase()}
                     </span>
                 </td>
+                <td style="font-size: 11px; color: var(--text-muted)">
+                    ${a.scheduled_at ? `Starts: ${ui.formatDate(a.scheduled_at)}<br>` : ''}
+                    ${a.expires_at ? `Exp: ${ui.formatDate(a.expires_at)}` : (a.scheduled_at ? '' : 'Immediate')}
+                </td>
                 <td>
-                    <button class="btn btn--danger btn--sm" onclick="admin.deleteAnnouncement(${a.id})">Delete</button>
+                    <button class="status-toggle ${a.active ? 'status-toggle--active' : ''}" 
+                        onclick="admin.updateAnnouncementStatus(${a.id}, ${!a.active})">
+                        ${a.active ? 'Active' : 'Inactive'}
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn--danger btn--sm" onclick="admin.deleteAnnouncement(${a.id})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </td>
             </tr>
         `).join('');
@@ -234,18 +353,33 @@ async function loadAnnouncements() {
     }
 }
 
-document.getElementById('announcementForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('newAnnouncementMsg');
-    try {
-        await api.createAdminAnnouncement(input.value);
-        input.value = '';
-        ui.showToast('Announcement published', 'success');
-        loadAnnouncements();
-    } catch (err) {
-        ui.showToast(err.message, 'error');
-    }
-});
+// Announcement form handler
+const annForm = document.getElementById('announcementForm');
+if (annForm) {
+    annForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = document.getElementById('newAnnouncementMsg').value;
+        const target_program = document.getElementById('announcementTarget').value;
+        const priority = document.getElementById('announcementPriority').value;
+        const scheduled_at = document.getElementById('announcementStart').value || null;
+        const expires_at = document.getElementById('announcementEnd').value || null;
+
+        try {
+            await api.createAdminAnnouncement({
+                message,
+                target_program,
+                priority,
+                scheduled_at: scheduled_at ? new Date(scheduled_at).toISOString() : null,
+                expires_at: expires_at ? new Date(expires_at).toISOString() : null
+            });
+            ui.showToast('Announcement published', 'success');
+            annForm.reset();
+            loadAnnouncements();
+        } catch (err) {
+            ui.showToast('Failed to publish', 'error');
+        }
+    });
+}
 
 // Global 'admin' object for actions
 window.admin = {
@@ -328,9 +462,9 @@ window.admin = {
 
         document.getElementById('adminEditModal').classList.remove('hidden');
     },
-    async toggleAnnouncement(id, active) {
+    async updateAnnouncementStatus(id, active) {
         try {
-            await api.toggleAdminAnnouncement(id, active);
+            await api.updateAdminAnnouncement(id, { active });
             loadAnnouncements();
         } catch (err) {
             ui.showToast(err.message, 'error');
@@ -351,7 +485,7 @@ window.admin = {
 };
 
 // Filters listeners
-['userSearch', 'userFilterRole'].forEach(id => {
+['userSearch', 'userFilterRole', 'userFilterInactive'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => loadUsers());
 });

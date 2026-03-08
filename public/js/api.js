@@ -144,6 +144,32 @@ const api = {
         return await res.json();
     },
 
+    // Admin Analytics
+    async getAdminNOCLeaderboard() {
+        const res = await fetch(`${API_BASE}/admin/analytics/noc-leaderboard`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminMonthlyTrends() {
+        const res = await fetch(`${API_BASE}/admin/analytics/monthly-trends`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminUserGrowth() {
+        const res = await fetch(`${API_BASE}/admin/analytics/user-growth`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminUserSummary() {
+        const res = await fetch(`${API_BASE}/admin/analytics/user-summary`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminRiskBreakdown() {
+        const res = await fetch(`${API_BASE}/admin/analytics/risk-breakdown`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
     async updateAdminApplication(id, appData) {
         const res = await fetch(`${API_BASE}/admin/applications/${id}`, {
             method: 'PUT',
@@ -187,20 +213,20 @@ const api = {
         return await res.json();
     },
 
-    async createAdminAnnouncement(message) {
+    async createAdminAnnouncement(data) {
         const res = await fetch(`${API_BASE}/admin/announcements`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify({ message, active: 1 })
+            body: JSON.stringify({ ...data, active: 1 })
         });
         return await res.json();
     },
 
-    async toggleAdminAnnouncement(id, active) {
+    async updateAdminAnnouncement(id, data) {
         const res = await fetch(`${API_BASE}/admin/announcements/${id}`, {
             method: 'PUT',
             headers: this.getHeaders(),
-            body: JSON.stringify({ active })
+            body: JSON.stringify(data)
         });
         return await res.json();
     },

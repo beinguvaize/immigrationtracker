@@ -74,17 +74,44 @@ function initDB() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             message TEXT NOT NULL,
             active BOOLEAN DEFAULT 1,
+            priority TEXT DEFAULT 'normal', -- 'normal', 'urgent'
+            target_program TEXT DEFAULT 'All', -- 'All', 'NS PNP', 'AIP'
+            scheduled_at TEXT,
+            expires_at TEXT,
             created_at TEXT DEFAULT (datetime('now'))
         )
       `);
 
+      await dbClient.execute(`
+        CREATE TABLE IF NOT EXISTS login_activity (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            email TEXT NOT NULL,
+            type TEXT NOT NULL, -- 'login', 'failed_login', 'logout'
+            success BOOLEAN DEFAULT 1,
+            ip_address TEXT,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+      `);
+
       // Migration: Add columns if they don't exist
+      try { await dbClient.execute("ALTER TABLE users ADD COLUMN last_login_at TEXT"); } catch (e) { }
       try { await dbClient.execute("ALTER TABLE applications ADD COLUMN status_note TEXT"); } catch (e) { }
       try { await dbClient.execute("ALTER TABLE applications ADD COLUMN ns_graduate BOOLEAN DEFAULT 0"); } catch (e) { }
       try { await dbClient.execute("ALTER TABLE applications ADD COLUMN has_case_number BOOLEAN DEFAULT 0"); } catch (e) { }
       try { await dbClient.execute("ALTER TABLE applications ADD COLUMN case_number_date TEXT"); } catch (e) { }
 
+      // Phase 2 Migrations
+      try { await dbClient.execute("ALTER TABLE announcements ADD COLUMN priority TEXT DEFAULT 'normal'"); } catch (e) { }
+      try { await dbClient.execute("ALTER TABLE announcements ADD COLUMN target_program TEXT DEFAULT 'All'"); } catch (e) { }
+      try { await dbClient.execute("ALTER TABLE announcements ADD COLUMN scheduled_at TEXT"); } catch (e) { }
+      try { await dbClient.execute("ALTER TABLE announcements ADD COLUMN expires_at TEXT"); } catch (e) { }
+
       // Create indexes
+      try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)'); } catch (e) { }
+      try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_login_activity_user ON login_activity(user_id)'); } catch (e) { }
+      try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_login_activity_time ON login_activity(created_at)'); } catch (e) { }
       try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_applications_user ON applications(user_id)'); } catch (e) { }
       try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_applications_program ON applications(program_type, stream)'); } catch (e) { }
       try { await dbClient.execute('CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status)'); } catch (e) { }
