@@ -94,6 +94,21 @@ const api = {
         return await res.json();
     },
 
+    async getActivityFeed() {
+        const res = await fetch(`${API_BASE}/stats/activity-feed`);
+        return await res.json();
+    },
+
+    async getNOCStats(code) {
+        const res = await fetch(`${API_BASE}/stats/noc/${code}`);
+        return await res.json();
+    },
+
+    async getInsights() {
+        const res = await fetch(`${API_BASE}/stats/insights`);
+        return await res.json();
+    },
+
     // Admin
     async getAdminDashboard() {
         const res = await fetch(`${API_BASE}/admin/dashboard`, { headers: this.getHeaders() });
@@ -126,6 +141,32 @@ const api = {
     async getAdminApplications(params = {}) {
         const searchParams = new URLSearchParams(params);
         const res = await fetch(`${API_BASE}/admin/applications?${searchParams}`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    // Admin Analytics
+    async getAdminNOCLeaderboard() {
+        const res = await fetch(`${API_BASE}/admin/analytics/noc-leaderboard`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminMonthlyTrends() {
+        const res = await fetch(`${API_BASE}/admin/analytics/monthly-trends`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminUserGrowth() {
+        const res = await fetch(`${API_BASE}/admin/analytics/user-growth`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminUserSummary() {
+        const res = await fetch(`${API_BASE}/admin/analytics/user-summary`, { headers: this.getHeaders() });
+        return await res.json();
+    },
+
+    async getAdminRiskBreakdown() {
+        const res = await fetch(`${API_BASE}/admin/analytics/risk-breakdown`, { headers: this.getHeaders() });
         return await res.json();
     },
 
@@ -172,20 +213,20 @@ const api = {
         return await res.json();
     },
 
-    async createAdminAnnouncement(message) {
+    async createAdminAnnouncement(data) {
         const res = await fetch(`${API_BASE}/admin/announcements`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify({ message, active: 1 })
+            body: JSON.stringify({ ...data, active: 1 })
         });
         return await res.json();
     },
 
-    async toggleAdminAnnouncement(id, active) {
+    async updateAdminAnnouncement(id, data) {
         const res = await fetch(`${API_BASE}/admin/announcements/${id}`, {
             method: 'PUT',
             headers: this.getHeaders(),
-            body: JSON.stringify({ active })
+            body: JSON.stringify(data)
         });
         return await res.json();
     },

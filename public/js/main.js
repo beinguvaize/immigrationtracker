@@ -82,6 +82,11 @@ function initAuth() {
         const email = document.getElementById('authEmail').value;
         const password = document.getElementById('authPassword').value;
         const errorEl = document.getElementById('authError');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const originalBtnText = submitBtn.innerText;
+
+        // Hide errors and reset state
+        errorEl.classList.add('hidden');
 
         // Validate password match on signup
         if (!isLogin) {
@@ -93,12 +98,34 @@ function initAuth() {
             }
         }
 
+        // 1. Loading State
+        submitBtn.classList.add('btn--loading');
+        submitBtn.disabled = true;
+
         try {
             const data = isLogin ? await api.login(email, password) : await api.register(email, password);
             state.user = data.user;
-            showApp();
-            ui.showToast(`Welcome, ${state.user.email}!`, 'success');
+
+            // 2. Success State
+            submitBtn.classList.remove('btn--loading');
+            submitBtn.classList.add('btn--success');
+
+            // Wait briefly to show the checkmark, then transition
+            setTimeout(() => {
+                showApp();
+                ui.showToast(`Welcome, ${state.user.email}!`, 'success');
+                // Reset button for future logouts
+                submitBtn.classList.remove('btn--success');
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            }, 800);
+
         } catch (err) {
+            // Restore button on error
+            submitBtn.classList.remove('btn--loading');
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+
             errorEl.innerText = err.message;
             errorEl.classList.remove('hidden');
         }
@@ -126,10 +153,23 @@ function showApp() {
         if (adminLink) adminLink.classList.remove('hidden');
     }
 
+    // WhatsApp Banner Auto-Hide (10 seconds)
+    const whatsappBanner = document.querySelector('.whatsapp-banner');
+    if (whatsappBanner) {
+        setTimeout(() => {
+            whatsappBanner.classList.add('whatsapp-banner--fade-out');
+            // Remove from DOM after transition for cleanliness
+            setTimeout(() => {
+                whatsappBanner.style.display = 'none';
+            }, 600);
+        }, 10000);
+    }
+
     // Load data
     loadUserData();
     loadAggregateData();
     loadTableData();
+    loadCommunityData();
     loadAnnouncement();
     initFilters();
     initTableControls();
@@ -166,12 +206,31 @@ function initNavigation() {
 
 async function loadAnnouncement() {
     try {
-        const data = await api.getActiveAnnouncement();
+        const { announcements } = await api.getActiveAnnouncement();
         const bannerContainer = document.getElementById('systemAnnouncement');
+        if (!bannerContainer) return;
+
         const textContainer = bannerContainer.querySelector('.announcement-text');
 
-        if (data && data.announcement) {
-            textContainer.innerText = data.announcement.message;
+        // Filter by program targeting
+        const userPrograms = state.apps ? [...new Set(state.apps.map(a => a.program_type))] : [];
+        const filtered = announcements.filter(a =>
+            a.target_program === 'All' || userPrograms.includes(a.target_program)
+        );
+
+        if (filtered.length > 0) {
+            // Find most recent urgent announcement
+            const urgent = filtered.find(a => a.priority === 'urgent');
+            const display = urgent || filtered[0];
+
+            textContainer.innerText = display.message;
+
+            // Priority styling
+            bannerContainer.className = 'announcement-banner'; // Reset
+            if (display.priority === 'urgent') {
+                bannerContainer.classList.add('announcement-banner--urgent');
+            }
+
             bannerContainer.classList.remove('hidden');
         } else {
             bannerContainer.classList.add('hidden');
@@ -249,6 +308,50 @@ function populateNocFilter(nocCodes, elementId) {
     el.innerHTML = '<option value="">All NOC Codes</option>' +
         nocCodes.map(n => `<option value="${n.noc_code}">${n.noc_code} (${n.count})</option>`).join('');
     el.value = currentVal;
+}
+
+// ===== COMMUNITY DATA =====
+async function loadCommunityData() {
+    try {
+        const [feedData, insightsData] = await Promise.all([
+            api.getActivityFeed(),
+            api.getInsights()
+        ]);
+
+        const activityEl = document.getElementById('activityFeedContainer');
+        if (activityEl) {
+            activityEl.innerHTML = ui.renderActivityFeed(feedData.feed);
+        }
+
+        const insightsEl = document.getElementById('insightsContainer');
+        if (insightsEl) {
+            insightsEl.innerHTML = ui.renderInsightsBanner(insightsData.batches);
+        }
+
+        // Check for "Similar to You" Alerts
+        checkPersonalAlerts(feedData.feed);
+
+    } catch (err) {
+        console.error('Failed to load community data', err);
+    }
+}
+
+function checkPersonalAlerts(feed) {
+    if (!state.apps || state.apps.length === 0 || !feed) return;
+
+    // Look for recent nominations matching user's NOC and Stream
+    const recentNominations = feed.filter(f =>
+        (f.status === 'Nominated' || f.status === 'Endorsed') &&
+        (new Date() - new Date(f.updated_at)) < (1000 * 60 * 60 * 24 * 7) // Last 7 days for visibility
+    );
+
+    state.apps.forEach(app => {
+        const match = recentNominations.find(n => n.noc_code === app.noc_code && n.stream === app.stream);
+        if (match) {
+            // Check if we already showed this session to avoid spam (optional)
+            ui.showToast(`🚀 Alert: Someone with NOC ${match.noc_code} in ${match.stream} just got Nominated!`, 'success');
+        }
+    });
 }
 
 // ===== TABLE DATA =====
@@ -431,6 +534,23 @@ window.app = {
         }
 
         modal.classList.remove('hidden');
+        // Force reflow
+        void modal.offsetWidth;
+        modal.classList.add('modal-overlay--active');
+        modal.querySelector('.modal').classList.add('modal--showing');
+    },
+
+    closeModal() {
+        const modal = document.getElementById('appModal');
+        const modalContent = modal.querySelector('.modal');
+
+        modalContent.classList.remove('modal--showing');
+        modal.classList.remove('modal-overlay--active');
+
+        // Wait for animation to finish (0.3s) before hiding
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
     },
 
     async deleteApplication(id) {
@@ -455,8 +575,8 @@ window.app = {
 
 // Modal events
 document.getElementById('addAppBtn').addEventListener('click', () => app.openModal());
-document.getElementById('modalCloseBtn').addEventListener('click', () => document.getElementById('appModal').classList.add('hidden'));
-document.getElementById('modalCancelBtn').addEventListener('click', () => document.getElementById('appModal').classList.add('hidden'));
+document.getElementById('modalCloseBtn').addEventListener('click', () => app.closeModal());
+document.getElementById('modalCancelBtn').addEventListener('click', () => app.closeModal());
 
 document.getElementById('hasCaseNumber').addEventListener('change', (e) => {
     document.getElementById('caseNumberDateContainer').classList.toggle('hidden', !e.target.checked);
@@ -468,17 +588,20 @@ function toggleNominatedDateField() {
     const status = document.getElementById('appStatus').value;
     const container = document.getElementById('nominatedDateContainer');
     const label = document.getElementById('nominatedDateLabel');
+    const input = document.getElementById('nominatedDate');
 
     if (status === 'Nominated' || status === 'Endorsed' || status === 'Selected for EOI') {
         container.classList.remove('hidden');
+        input.setAttribute('required', 'required'); // Force HTML validation
         if (status === 'Selected for EOI') {
-            label.innerText = 'Selection Date';
+            label.innerText = 'Selection Date *';
         } else {
-            label.innerText = 'When were you nominated?';
+            label.innerText = 'When were you nominated? *';
         }
     } else {
         container.classList.add('hidden');
-        document.getElementById('nominatedDate').value = '';
+        input.removeAttribute('required'); // Remove HTML validation
+        input.value = '';
     }
 }
 
@@ -534,19 +657,40 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
         ns_graduate: document.getElementById('nsGraduate').checked,
         has_case_number: hasCaseNum,
         case_number_date: hasCaseNum ? document.getElementById('caseNumberDate').value : null,
-        nominated_date: document.getElementById('appStatus').value === 'Nominated' ? document.getElementById('nominatedDate').value : null
+        nominated_date: (document.getElementById('appStatus').value === 'Nominated' || document.getElementById('appStatus').value === 'Endorsed' || document.getElementById('appStatus').value === 'Selected for EOI') ? document.getElementById('nominatedDate').value : null
     };
 
+    const submitBtn = document.getElementById('modalSubmitBtn');
+    const originalBtnText = submitBtn.innerHTML;
+
     try {
+        // Micro-interaction: Loading state
+        submitBtn.classList.add('btn--loading');
+
         const res = id ? await api.updateApplication(id, appData) : await api.createApplication(appData);
         if (res.error) throw new Error(res.error);
 
-        document.getElementById('appModal').classList.add('hidden');
-        ui.showToast(id ? 'Application updated' : 'Application added', 'success');
-        loadUserData();
-        loadAggregateData();
-        loadTableData();
+        // Micro-interaction: Success state
+        submitBtn.classList.remove('btn--loading');
+        submitBtn.classList.add('btn--success');
+        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+
+        // Brief pause to show success before closing
+        setTimeout(() => {
+            app.closeModal();
+            // Reset button after modal is hidden
+            setTimeout(() => {
+                submitBtn.classList.remove('btn--success');
+                submitBtn.innerHTML = originalBtnText;
+            }, 500);
+
+            ui.showToast(id ? 'Application updated' : 'Application added', 'success');
+            loadUserData();
+            loadAggregateData();
+            loadTableData();
+        }, 800);
     } catch (err) {
+        submitBtn.classList.remove('btn--loading');
         ui.showToast(err.message, 'error');
     }
 });

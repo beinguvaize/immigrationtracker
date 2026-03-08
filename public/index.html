@@ -112,6 +112,21 @@
               <i class="fa-solid fa-circle-question"></i>
               Help
             </a>
+            <div class="side-nav__cta">
+              <div class="cta-card">
+                <div class="cta-card__icon">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="cta-card__content">
+                  <h4 class="cta-card__title">WhatsApp Community</h4>
+                  <p class="cta-card__text">Get instant support and updates from the group.</p>
+                  <a href="https://chat.whatsapp.com/Klnsxaj89a0Jgei2mgx04r" target="_blank"
+                    class="btn btn--sm btn--whatsapp" style="width: 100%; margin-top: var(--space-2);">
+                    Join Now
+                  </a>
+                </div>
+              </div>
+            </div>
             <button class="side-nav__link logout-btn" id="logoutBtn"
               style="width: 100%; text-align: left; background: none; border: none; cursor: pointer;">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -158,9 +173,26 @@
       <!-- Content Area -->
       <main class="content-area">
         <!-- Global System Announcement -->
-        <div id="systemAnnouncement" class="hidden"
-          style="margin-bottom: var(--space-6); background: var(--warning-bg); color: var(--warning); padding: var(--space-4); border-radius: var(--radius-lg); border-left: 4px solid var(--warning); font-weight: var(--fw-medium); font-size: var(--fs-sm);">
+        <div id="systemAnnouncement" class="announcement-banner hidden">
           <span class="announcement-text"></span>
+        </div>
+
+        <!-- WhatsApp Community Banner -->
+        <div class="whatsapp-banner">
+          <div style="display: flex; align-items: center; gap: var(--space-4);" class="whatsapp-banner__content">
+            <div class="whatsapp-banner__icon">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div>
+              <h3 class="whatsapp-banner__title">Join our WhatsApp Community!</h3>
+              <p class="whatsapp-banner__text">Connect with other NS PNP & AIP applicants, share updates, and get
+                instant support from the group.</p>
+            </div>
+          </div>
+          <a href="https://chat.whatsapp.com/Klnsxaj89a0Jgei2mgx04r" target="_blank" class="btn btn--whatsapp"
+            style="padding: var(--space-3) var(--space-6); white-space: nowrap;">
+            <i class="fa-brands fa-whatsapp" style="margin-right: 8px;"></i> Join Community
+          </a>
         </div>
 
         <!-- Dashboard Panel -->
@@ -177,6 +209,9 @@
               </button>
             </div>
           </div>
+
+          <!-- Community Insights Section -->
+          <div id="insightsContainer"></div>
 
           <!-- Latest Wins / Recent Successes Widget Section -->
           <div id="recentSuccessesContainer"></div>
@@ -336,6 +371,18 @@
                 </div>
               </section>
             </div>
+
+            <!-- Right: Activity Feed & Sidebar Stats -->
+            <div class="dashboard-grid__right">
+              <section id="activitySection">
+                <div class="section-title-bar">
+                  <h2 class="section-title">Live Community Feed</h2>
+                </div>
+                <div id="activityFeedContainer">
+                  <!-- Activity items rendered by JS -->
+                </div>
+              </section>
+            </div>
           </div>
         </div>
 
@@ -414,6 +461,20 @@
                 directly at <a href="mailto:uvaize@hotmail.com"
                   style="color: var(--bg-accent); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--bg-accent-light);">uvaize@hotmail.com</a>.
                 I will do my best to support you and ensure the tracker remains helpful and accurate for everyone.</p>
+
+              <div
+                style="margin-top: var(--space-8); padding: var(--space-6); background: rgba(37, 211, 102, 0.05); border: 1px dashed #25D366; border-radius: var(--radius-lg); display: flex; align-items: center; gap: var(--space-4); justify-content: center; flex-direction: column; text-align: center;">
+                <div style="font-size: 2rem; color: #25D366;"><i class="fa-brands fa-whatsapp"></i></div>
+                <div>
+                  <h4 style="color: #1ebe57; margin-bottom: var(--space-2); font-weight: 700;">Prefer Real-time Support?
+                  </h4>
+                  <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--space-4);">Join our
+                    WhatsApp community group to chat with other applicants and the admin.</p>
+                  <a href="https://chat.whatsapp.com/Klnsxaj89a0Jgei2mgx04r" target="_blank" class="btn btn--whatsapp">
+                    <i class="fa-brands fa-whatsapp" style="margin-right: 8px;"></i> Join WhatsApp Group
+                  </a>
+                </div>
+              </div>
 
               <p style="font-weight: 600; color: var(--bg-accent); font-size: 1.1rem; margin-bottom: 0;">Together, we
                 move forward step by step toward permanent residency and stability in Canada.</p>

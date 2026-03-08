@@ -61,7 +61,7 @@ const ui = {
                             <div class="status-pill__dot"></div>
                             ${app.status === 'Nominated' ? 'Nominated / Endorsed' : app.status}
                         </div>
-                        <div class="status-date">${this.getStatusDateLabel(app.status, app.updated_at)}</div>
+                        <div class="status-date">${this.getStatusDateLabel(app)}</div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(app.waiting_months)}</td>
@@ -221,7 +221,10 @@ const ui = {
                     ${stats.total_applicants}
                 </div>
                 <div class="stat-card__premium-trend">
-                    <span class="trend-val"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                    <span class="trend-val trend-val--${stats.growth_trend}">
+                        <i class="fa-solid fa-arrow-${stats.growth_trend === 'up' ? 'up' : 'down'}"></i> 
+                        ${Math.abs(stats.growth_pct)}%
+                    </span>
                     <span class="trend-label">from last month</span>
                 </div>
             </div>
@@ -269,7 +272,9 @@ const ui = {
 
             return `
             <div class="success-card">
-                <div class="success-card__icon"><i class="fa-solid fa-award"></i></div>
+                <div class="success-card__icon">
+                    <div class="success-card__icon-wrapper">🏆</div>
+                </div>
                 <div class="success-card__body">
                     <div class="success-card__title">${jobTitle}</div>
                     <div class="success-card__meta">NOC ${s.noc_code}${teer !== null ? ` · TEER ${teer}` : ''}</div>
@@ -326,8 +331,12 @@ const ui = {
                 <td>${this.formatDate(row.submission_date)}</td>
                 <td>
                     <div class="status-column">
-                        <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">${row.status}</div>
-                        <div class="status-date">${this.getStatusDateLabel(row.status, row.updated_at)}</div>
+                        <div class="status-pill status-pill--${row.status.toLowerCase().replace(/ /g, '-')}">
+                            ${row.status === 'Nominated' ? 'NOMINATED / ENDORSED' : row.status.toUpperCase()}
+                        </div>
+                        <div class="status-date" style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">
+                            ${this.getStatusDateLabel(row)}
+                        </div>
                     </div>
                 </td>
                 <td class="cell-mono">${this.formatWaitTime(row.waiting_months)}</td>
@@ -372,7 +381,14 @@ const ui = {
         `;
     },
 
-    getStatusDateLabel(status, date) {
+    getStatusDateLabel(app) {
+        let date = app.updated_at;
+
+        // Use the specifically entered nominated_date for these statuses
+        if ((app.status === 'Nominated' || app.status === 'Endorsed' || app.status === 'Selected for EOI') && app.nominated_date) {
+            date = app.nominated_date;
+        }
+
         if (!date) return '';
         return `on ${this.formatDate(date)}`;
     },
@@ -395,8 +411,8 @@ const ui = {
             // Convert "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DDTHH:MM:SS"
             normalized = dateStr.replace(' ', 'T');
         } else if (!dateStr.includes('T')) {
-            // Force local time for "YYYY-MM-DD"
-            normalized = dateStr + 'T00:00:00';
+            // Force local time parser exactly at noon to avoid any midnight timezone shifting
+            normalized = dateStr + 'T12:00:00';
         }
 
         const date = new Date(normalized);
@@ -404,6 +420,68 @@ const ui = {
 
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return date.toLocaleDateString(undefined, options);
+    },
+
+    // ===== COMMUNITY ACTIVITY & INSIGHTS =====
+    renderActivityFeed(feed) {
+        if (!feed || feed.length === 0) return '<div class="empty-state-mini">No recent activity</div>';
+
+        return feed.map(item => {
+            const timeStr = this.getDaysAgo(item.updated_at);
+            const waitStr = (item.status === 'Nominated' || item.status === 'Endorsed') && item.waiting_months
+                ? ` · Waited ${this.formatWaitTime(item.waiting_months)}`
+                : '';
+
+            let statusIcon = 'fa-circle-info';
+            let statusClass = '';
+            if (item.status === 'Nominated' || item.status === 'Endorsed') {
+                statusIcon = 'fa-circle-check';
+                statusClass = 'status-text--success';
+            } else if (item.status === 'Refused') {
+                statusIcon = 'fa-circle-xmark';
+                statusClass = 'status-text--danger';
+            }
+
+            return `
+                <div class="activity-item">
+                    <div class="activity-item__icon ${statusClass}">
+                        <i class="fa-solid ${statusIcon}"></i>
+                    </div>
+                    <div class="activity-item__content">
+                        <div class="activity-item__text">
+                            <strong>NOC ${item.noc_code}</strong> · ${item.program_type}
+                            <div class="activity-item__status">${item.status}${waitStr}</div>
+                        </div>
+                        <div class="activity-item__time">${timeStr}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    renderInsightsBanner(batches) {
+        if (!batches || batches.length === 0) return '';
+
+        const insights = batches.map(b => {
+            const [year, month] = b.submission_month.split('-');
+            const monthName = new Date(year, parseInt(month) - 1).toLocaleString('default', { month: 'long' });
+            return `<li><i class="fa-solid fa-bullhorn" style="margin-right:8px; font-size:12px; opacity:0.7;"></i> <strong>${monthName} ${year}</strong> submissions for <strong>${b.program_type}</strong> are moving! (${b.nomination_count} recent wins)</li>`;
+        }).join('');
+
+        return `
+            <div class="insights-banner">
+                <div class="insights-banner__icon">
+                    <div class="pulse-ring"></div>
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="insights-banner__content">
+                    <h4 class="insights-banner__title">Batch Detection Insights</h4>
+                    <ul class="insights-banner__list">
+                        ${insights}
+                    </ul>
+                </div>
+            </div>
+        `;
     },
 
     // ===== ADMIN UI =====
