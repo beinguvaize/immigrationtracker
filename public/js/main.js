@@ -126,6 +126,18 @@ function showApp() {
         if (adminLink) adminLink.classList.remove('hidden');
     }
 
+    // WhatsApp Banner Auto-Hide (10 seconds)
+    const whatsappBanner = document.querySelector('.whatsapp-banner');
+    if (whatsappBanner) {
+        setTimeout(() => {
+            whatsappBanner.classList.add('whatsapp-banner--fade-out');
+            // Remove from DOM after transition for cleanliness
+            setTimeout(() => {
+                whatsappBanner.style.display = 'none';
+            }, 600);
+        }, 10000);
+    }
+
     // Load data
     loadUserData();
     loadAggregateData();
@@ -495,6 +507,23 @@ window.app = {
         }
 
         modal.classList.remove('hidden');
+        // Force reflow
+        void modal.offsetWidth;
+        modal.classList.add('modal-overlay--active');
+        modal.querySelector('.modal').classList.add('modal--showing');
+    },
+
+    closeModal() {
+        const modal = document.getElementById('appModal');
+        const modalContent = modal.querySelector('.modal');
+
+        modalContent.classList.remove('modal--showing');
+        modal.classList.remove('modal-overlay--active');
+
+        // Wait for animation to finish (0.3s) before hiding
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
     },
 
     async deleteApplication(id) {
@@ -519,8 +548,8 @@ window.app = {
 
 // Modal events
 document.getElementById('addAppBtn').addEventListener('click', () => app.openModal());
-document.getElementById('modalCloseBtn').addEventListener('click', () => document.getElementById('appModal').classList.add('hidden'));
-document.getElementById('modalCancelBtn').addEventListener('click', () => document.getElementById('appModal').classList.add('hidden'));
+document.getElementById('modalCloseBtn').addEventListener('click', () => app.closeModal());
+document.getElementById('modalCancelBtn').addEventListener('click', () => app.closeModal());
 
 document.getElementById('hasCaseNumber').addEventListener('change', (e) => {
     document.getElementById('caseNumberDateContainer').classList.toggle('hidden', !e.target.checked);
@@ -601,16 +630,37 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
         nominated_date: document.getElementById('appStatus').value === 'Nominated' ? document.getElementById('nominatedDate').value : null
     };
 
+    const submitBtn = document.getElementById('modalSubmitBtn');
+    const originalBtnText = submitBtn.innerHTML;
+
     try {
+        // Micro-interaction: Loading state
+        submitBtn.classList.add('btn--loading');
+
         const res = id ? await api.updateApplication(id, appData) : await api.createApplication(appData);
         if (res.error) throw new Error(res.error);
 
-        document.getElementById('appModal').classList.add('hidden');
-        ui.showToast(id ? 'Application updated' : 'Application added', 'success');
-        loadUserData();
-        loadAggregateData();
-        loadTableData();
+        // Micro-interaction: Success state
+        submitBtn.classList.remove('btn--loading');
+        submitBtn.classList.add('btn--success');
+        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+
+        // Brief pause to show success before closing
+        setTimeout(() => {
+            app.closeModal();
+            // Reset button after modal is hidden
+            setTimeout(() => {
+                submitBtn.classList.remove('btn--success');
+                submitBtn.innerHTML = originalBtnText;
+            }, 500);
+
+            ui.showToast(id ? 'Application updated' : 'Application added', 'success');
+            loadUserData();
+            loadAggregateData();
+            loadTableData();
+        }, 800);
     } catch (err) {
+        submitBtn.classList.remove('btn--loading');
         ui.showToast(err.message, 'error');
     }
 });
