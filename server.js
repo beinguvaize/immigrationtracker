@@ -43,7 +43,6 @@ async function startServer() {
     });
 
     // Initialize
-    seedDatabase();
     startAutomation();
 
     app.listen(PORT, () => {
