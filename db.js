@@ -138,8 +138,17 @@ function getDB() {
 
 // Helper functions that mimic better-sqlite3's API to keep the rest of the app unchanged
 function prepare(sql) {
+  const isProduction = (process.env.DATABASE_URL || '').includes('ircc-beinguvaize');
+  const isWrite = /^(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|REPLACE)/i.test(sql.trim());
+
   return {
     async run(...params) {
+      if (isProduction && isWrite && process.env.FORCE_PRODUCTION !== 'true') {
+        const msg = '[DB SECURITY] Blocked write attempt to production! Set FORCE_PRODUCTION=true to override.';
+        console.error(msg);
+        throw new Error(msg);
+      }
+
       const flattenedParams = params.length === 1 && Array.isArray(params[0]) ? params[0] : params;
 
       try {

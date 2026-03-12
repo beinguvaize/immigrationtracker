@@ -45,14 +45,6 @@ async function ensureDB() {
         dbInitPromise = initDB()
             .then(async () => {
                 dbReady = true;
-                // Seed only if no data yet (idempotent)
-                try {
-                    const { seedDatabase } = require('../services/seeder');
-                    await seedDatabase();
-                } catch (e) {
-                    // Non-fatal — seeder errors don't block the app
-                    console.error('[Boot] Seeder error (non-fatal):', e.message);
-                }
             })
             .catch(err => {
                 dbError = err;
